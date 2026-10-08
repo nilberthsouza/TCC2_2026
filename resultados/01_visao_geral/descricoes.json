@@ -1,0 +1,7 @@
+{
+  "curva_potencia_ativa.png": "Curva horária de potência ativa total entregue pela fonte (kW), 24 h.",
+  "curva_potencia_reativa.png": "Curva horária de potência reativa total entregue pela fonte (kvar), 24 h.",
+  "curva_perdas.png": "Curva horária de perdas ativas totais do alimentador (kW), 24 h.",
+  "curva_tensao_media.png": "Curva horária da tensão média nas barras do alimentador (pu), 24 h.",
+  "histograma_transformadores.png": "Histograma da quantidade de transformadores por potência nominal (kVA)."
+}

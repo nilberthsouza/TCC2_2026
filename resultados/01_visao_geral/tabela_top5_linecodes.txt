@@ -1,0 +1,18 @@
+% Contexto: Visao geral do alimentador - top 5 linecodes mais usados (numero de trechos).
+
+\begin{table}[htbp]
+  \centering
+  \caption{Cinco linecodes mais usados no alimentador JMLT310 reduzido}
+  \label{tab:top5_linecodes}
+  \begin{tabular}{lccccc}
+    \toprule
+    \textbf{Linecode} & \textbf{Trechos} & \textbf{km} & \textbf{Fases} & \textbf{R1 (Ω/km)} & \textbf{X1 (Ω/km)} \\
+    \midrule
+    48_3 & 61 & 6{,}490 & 3 & 0{,}9750 & 0{,}5244 \\
+    46_3 & 52 & 5{,}400 & 3 & 1{,}5510 & 0{,}5207 \\
+    35_3 & 49 & 3{,}463 & 3 & 0{,}9750 & 0{,}5244 \\
+    1193_1 & 23 & 2{,}335 & 1 & 1{,}5510 & 0{,}5207 \\
+    77_3 & 18 & 2{,}119 & 3 & 0{,}2006 & 0{,}7049 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

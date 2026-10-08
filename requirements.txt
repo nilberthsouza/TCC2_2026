@@ -1,0 +1,7 @@
+py-dss-interface==2.3.0
+pandas==3.0.6
+numpy==2.4.6
+networkx==3.6.1
+matplotlib==3.11.2
+seaborn==0.13.2
+scipy==1.17.1
