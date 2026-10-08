@@ -12,9 +12,11 @@ from pathlib import Path
 
 from tcc2026.configuracao import PASTA_RESULTADOS
 from tcc2026.topologia import visao_geral
+from tcc2026.faltas import tabela_barras
 
 SECOES_DISPONIVEIS = {
     "visao_geral": ("01_visao_geral", lambda pasta: visao_geral.executar_visao_geral(pasta)),
+    "tabela_tres_barras": ("02_tabela_falta_tres_barras", lambda pasta: tabela_barras.executar_tabela_barras(pasta)),
 }
 
 

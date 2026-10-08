@@ -125,3 +125,95 @@ def calcular_parametros_sequencia_losangular_cemig(nome_geometria: str = "GEOM_L
         "c1_nf_km": c1_mat.real,
         "c0_nf_km": c0_mat.real,
     }
+
+
+@lru_cache(maxsize=1)
+def calcular_parametros_sequencia_monofasico_cemig(nome_geometria: str = "GEOM_MONO_CEMIG",
+                                                     nome_condutor: str = "COND_REF_CEMIG") -> dict:
+    """
+    Calcula a impedancia de laco (fase + neutro reduzido) por km de um ramal
+    monofasico MT, usado como referencia para os trechos monofasicos do
+    alimentador (mesma logica/condutor da geometria losangular trifasica,
+    ver calcular_parametros_sequencia_losangular_cemig). Como ha so um
+    condutor de fase, a transformacao de componentes simetricas e trivial:
+    Z1 = Z0 = impedancia propria do laco fase-neutro.
+
+    ATENCAO: mesmo aviso de singleton do motor OpenDSS que
+    calcular_parametros_sequencia_losangular_cemig (resultado cacheado).
+
+    Entradas:
+        nome_geometria: nome do objeto LineGeometry criado internamente.
+        nome_condutor: nome do objeto WireData criado internamente.
+    Saida:
+        dicionario com r1_ohm_km, x1_ohm_km, r0_ohm_km, x0_ohm_km (ohm/km,
+        com r0=r1 e x0=x1 pela natureza monofasica do trecho) e c1_nf_km,
+        c0_nf_km (nF/km).
+    """
+    c = CONDUTOR_REFERENCIA
+    g = GEOMETRIA_LOSANGULAR_CEMIG
+    dss_aux = py_dss_interface.DSS()
+    dss_aux.text("clear")
+    dss_aux.text("new circuit.aux_geometria_1f basekv=13.8 bus1=aux1 pu=1.0")
+    dss_aux.text(
+        f'new wiredata.{nome_condutor} Rdc={c["rdc_ohm_km"]} Rac={c["rac_ohm_km"]} '
+        f'GMRac={c["gmr_m"]} GMRunits=m Radius={c["raio_m"]} Diam={c["diametro_m"]} '
+        f'radunits=m normamps={c["normamps"]} runits=km'
+    )
+    h = g["altura_base_m"]
+    dss_aux.text(f'new linegeometry.{nome_geometria} nconds=2 nphases=1 reduce=yes')
+    dss_aux.text(f'~ cond=1 wire={nome_condutor} x=0.0 h={h}')          # fase
+    dss_aux.text(f'~ cond=2 wire={nome_condutor} x=0.0 h={h - 0.3}')    # neutro reduzido
+    dss_aux.text('~ units=m')
+    dss_aux.text(
+        f'new line.linha_referencia_1f bus1=aux1.1 bus2=aux2.1 '
+        f'geometry={nome_geometria} length=1 units=km phases=1'
+    )
+    dss_aux.text("solve")
+    linhas = dss_aux.lines
+    linhas.name = "linha_referencia_1f"
+    z_self = complex(linhas.rmatrix[0], linhas.xmatrix[0])
+    c_self = complex(linhas.cmatrix[0], 0.0)
+    return {
+        "r1_ohm_km": z_self.real,
+        "x1_ohm_km": z_self.imag,
+        "r0_ohm_km": z_self.real,
+        "x0_ohm_km": z_self.imag,
+        "c1_nf_km": c_self.real,
+        "c0_nf_km": c_self.real,
+    }
+
+
+def acumular_parametros_linha_caminho(grafo, caminho: list) -> dict:
+    """
+    Soma R1/X1/R0/X0/C1/C0 e a distancia ao longo de uma sequencia de
+    barras (caminho), usando os parametros de referencia por km da
+    geometria losangular Cemig (trechos trifasicos) ou do laco monofasico
+    (trechos de 1 fase); trechos de transformador (comprimento 0) nao
+    entram na soma de impedancia de linha.
+
+    Entradas:
+        grafo: grafo eletrico do alimentador (arestas com "comprimento_km",
+            "fases" e "tipo", ver grafo_alimentador.construir_grafo_eletrico).
+        caminho: lista ordenada de barras (ex.: grafo_alimentador.caminho_entre_barras).
+    Saida:
+        dicionario com r1_ohm, x1_ohm, r0_ohm, x0_ohm (ohms totais),
+        c1_nf, c0_nf (nF totais) e distancia_km (km totais do caminho).
+    """
+    params_3f = calcular_parametros_sequencia_losangular_cemig()
+    params_1f = calcular_parametros_sequencia_monofasico_cemig()
+    acumulado = {"r1_ohm": 0.0, "x1_ohm": 0.0, "r0_ohm": 0.0, "x0_ohm": 0.0,
+                 "c1_nf": 0.0, "c0_nf": 0.0, "distancia_km": 0.0}
+    for a, b in zip(caminho[:-1], caminho[1:]):
+        dados = grafo.edges[a, b]
+        if dados["tipo"] != "linha":
+            continue
+        comprimento_km = dados["comprimento_km"]
+        params = params_3f if dados.get("fases") == 3 else params_1f
+        acumulado["r1_ohm"] += params["r1_ohm_km"] * comprimento_km
+        acumulado["x1_ohm"] += params["x1_ohm_km"] * comprimento_km
+        acumulado["r0_ohm"] += params["r0_ohm_km"] * comprimento_km
+        acumulado["x0_ohm"] += params["x0_ohm_km"] * comprimento_km
+        acumulado["c1_nf"] += params["c1_nf_km"] * comprimento_km
+        acumulado["c0_nf"] += params["c0_nf_km"] * comprimento_km
+        acumulado["distancia_km"] += comprimento_km
+    return acumulado

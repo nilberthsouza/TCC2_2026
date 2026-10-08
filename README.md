@@ -29,6 +29,9 @@ TCC2_2026/
 │   ├── topologia/
 │   │   └── visao_geral.py      # Secao 1: fluxo de potencia, curva horaria, topologia MT
 │   ├── faltas/                 # Secao 2: tabela de 3 barras (Thevenin/curto-circuito)
+│   │   ├── selecao_barras.py   # escolha das barras representativas (com/sem carga)
+│   │   ├── curto_circuito.py   # Thevenin, curto 1f/3f (modo FaultStudy), V/I de operacao
+│   │   └── tabela_barras.py    # orquestra a secao e gera as 3 tabelas (CSV + LaTeX)
 │   ├── extracao/                # Secao 3/4: extracao de sub-alimentador monofasico/trifasico
 │   ├── reatancia/                # metodo da reatancia aparente (com/sem carga, compensacao K0)
 │   ├── takagi/                   # metodo de Takagi (corrente e tensao, compensado)
@@ -109,7 +112,9 @@ logo em seguida.
 - [x] Seção 1 — Alimentador base e overview (fluxo de potência, curva
       horária, tronco/folhas/ramificações, transformadores por kVA, top-5
       linecodes, verificação/adaptação de LineGeometry).
-- [ ] Seção 2 — Tabela de 3 barras (Thevenin, curto monofásico/trifásico).
+- [x] Seção 2 — Tabela de 3 barras (Thevenin, curto monofásico/trifásico,
+      parâmetros de linha e carga concentrada para os 3 circuitos
+      equivalentes — ver `resultados/02_tabela_falta_tres_barras/LEIA-ME.md`).
 - [ ] Seção 3 — Trecho monofásico: extração, fluxo, reatância aparente.
 - [ ] Seção 4 — Trecho trifásico: extração, reatância com/sem compensação.
 - [ ] Seção 5 — Efeito da resistência de falta.

@@ -32,6 +32,23 @@ def formatar_numero_br(valor, decimais: int = 2) -> str:
     return texto.replace(".", "{,}")
 
 
+def formatar_complexo_br(valor: complex, decimais: int = 2) -> str:
+    """
+    Formata um numero complexo no padrao brasileiro para uso em tabela
+    LaTeX, ex.: (7.69+4.52j) -> "7{,}69 + j4{,}52".
+
+    Entradas:
+        valor: numero complexo (ex.: impedancia em ohms).
+        decimais: quantidade de casas decimais da parte real e imaginaria.
+    Saida:
+        string pronta para uso dentro de uma celula de tabela LaTeX.
+    """
+    sinal = "+" if valor.imag >= 0 else "-"
+    parte_real = formatar_numero_br(valor.real, decimais)
+    parte_imag = formatar_numero_br(abs(valor.imag), decimais)
+    return f"{parte_real} {sinal} j{parte_imag}"
+
+
 def gerar_tabela_latex(tabela: pd.DataFrame, legenda: str, rotulo: str,
                         decimais: dict | int = 2, alinhamento: str | None = None) -> str:
     """

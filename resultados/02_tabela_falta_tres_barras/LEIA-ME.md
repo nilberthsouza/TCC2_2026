@@ -1,0 +1,51 @@
+# Seção 2 — Tabela de 3 barras representativas (Thevenin / curto-circuito)
+
+Gerado por `tcc2026.faltas.tabela_barras.executar_tabela_barras`.
+
+## Barras selecionadas (ver `barras_selecionadas.csv`)
+
+- **Caso 1** — primeira barra com carga conectada (mais próxima da origem
+  entre as barras MT que têm um transformador ou uma carga MT ligada
+  diretamente): `NODE#2566408161`, 0,751 km da origem.
+- **Caso 2** — barra com carga conectada mais distante da origem:
+  `NODE#445010762`, 8,399 km (praticamente o próprio "tronco" do
+  alimentador, ver `01_visao_geral`).
+- **Caso 3** — barra folha MT (fim de ramal, sem transformador) sem
+  nenhuma carga conectada: `NODE#1194264563`, 8,079 km. A última carga do
+  mesmo ramal, usada no circuito equivalente, é `NODE#445010992`.
+
+## Circuitos equivalentes (para montar no Simulink)
+
+- **Casos 1 e 2**: fonte de tensão → linha (`tabela_parametros_linha.csv`,
+  segmento "fonte até a barra") → disjuntor → medição → carga concentrada
+  (`tabela_cargas_concentradas.csv`).
+- **Caso 3**: fonte de tensão → linha até a última carga do ramal → carga
+  concentrada → linha até a barra da falta (sem carga). Os dois segmentos
+  de linha ficam em `tabela_parametros_linha.csv`, com rótulos "fonte até a
+  última carga do ramal" e "última carga até a barra da falta".
+
+## Tabelas
+
+- `tabela_principal.csv`/`.txt`: tensão de operação (pu), corrente de
+  operação na barra (A), impedância de Thevenin de sequência positiva e
+  zero (Z1/Z0, Ω) e correntes de curto-circuito trifásico e
+  monofásico-terra francos (Ω) em cada uma das 3 barras.
+- `tabela_parametros_linha.csv`/`.txt`: r1/x1/r0/x0/c1/c0 e distância (km)
+  de cada segmento de linha dos 3 circuitos equivalentes, calculados com a
+  geometria de referência em espaçador losangular Cemig (ver
+  `01_visao_geral` e `tcc2026/nucleo/geometria_eletrica.py` — o alimentador
+  original não define LineGeometry).
+- `tabela_cargas_concentradas.csv`/`.txt`: potência ativa e reativa (QL
+  indutivo / Qc capacitivo) e corrente média a jusante de cada ponto de
+  carga concentrada.
+
+## Observação sobre a corrente de curto-circuito próxima à origem
+
+O `New Circuit...` do alimentador usa uma fonte praticamente ideal
+(`r1=0, x1=0.0001`), sem impedância de transformador de subestação
+modelada. Por isso a corrente de curto trifásico no Caso 1 (próximo à
+origem, Z1 ≈ 0,23+j0,28 Ω) sai bem mais alta (≈ 22 kA) que nos Casos 2 e 3
+(≈ 0,9 kA), já distantes o bastante para a impedância da linha dominar. Isso
+é uma característica do modelo fornecido (sem limitação de curto pela
+subestação), não um erro de cálculo — vale mencionar essa limitação no
+texto do TCC se os valores do Caso 1 forem usados para dimensionar proteção.
