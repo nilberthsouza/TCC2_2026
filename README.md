@@ -40,7 +40,8 @@ TCC2_2026/
 │   │   ├── estudo_monofasico.py  # orquestra a Secao 3 (trecho monofasico)
 │   │   └── estudo_trifasico.py   # orquestra a Secao 4 (trecho trifasico, 5 variantes)
 │   ├── takagi/                   # metodo de Takagi (corrente e tensao, compensado)
-│   └── resistencia_falta/        # efeito da resistencia de falta (Rf) na distancia estimada
+│   └── resistencia_falta/
+│       └── efeito_rf.py          # Secao 5: Rf no trecho 1f (10 barras) e superficie 3D no trecho 3f
 └── resultados/                  # saida de cada secao: CSVs, graficos .png e tabelas .tex/.txt
 ```
 
@@ -127,6 +128,9 @@ logo em seguida.
       fluxo/curva horária e as 5 variantes do método da reatância
       (com/sem carga × com/sem compensação K0 × correção do offset) —
       ver `resultados/04_trecho_trifasico/LEIA-ME.md`.
+- [x] Seção 5 — Efeito da resistência de falta: 10 barras × 4 valores de Rf
+      no trecho monofásico, e superfície 3D (Rf × diferença angular Z0/Z1)
+      no trecho trifásico — ver `resultados/05_resistencia_falta/LEIA-ME.md`.
 - [ ] Seção 3 — Trecho monofásico: extração, fluxo, reatância aparente.
 - [ ] Seção 4 — Trecho trifásico: extração, reatância com/sem compensação.
 - [ ] Seção 5 — Efeito da resistência de falta.

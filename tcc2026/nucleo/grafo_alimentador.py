@@ -54,11 +54,14 @@ def construir_grafo_eletrico(dss: py_dss_interface.DSS) -> nx.Graph:
         linhas.name = nome
         b1 = nome_barra_base(linhas.bus1)
         b2 = nome_barra_base(linhas.bus2)
+        partes_bus1 = linhas.bus1.split(".")
+        numeros_fase = tuple(int(p) for p in partes_bus1[1:]) if len(partes_bus1) > 1 else ()
         grafo.add_edge(
             b1, b2,
             comprimento_km=float(linhas.length),
             linecode=linhas.linecode,
             fases=int(linhas.phases),
+            numeros_fase=numeros_fase,
             tipo="linha",
             nome_elemento=nome,
         )
@@ -233,8 +236,11 @@ def barras_trecho_monofasico(grafo: nx.Graph, barra_raiz: str) -> set:
         barra_raiz: barra MT monofasica onde o trecho comeca.
     Saida:
         conjunto de nomes de barra do trecho monofasico (MT + secundarios
-        BT dos transformadores desse trecho).
+        BT dos transformadores desse trecho), todas na MESMA fase da
+        barra_raiz (um ramal monofasico so pode trocar de fase passando
+        por um transformador, que nao e atravessado na busca).
     """
+    fase_do_trecho = None
     visitados = {barra_raiz}
     pilha = [barra_raiz]
     while pilha:
@@ -244,6 +250,11 @@ def barras_trecho_monofasico(grafo: nx.Graph, barra_raiz: str) -> set:
                 continue
             dados = grafo.edges[atual, vizinho]
             if dados["tipo"] == "linha" and dados["fases"] == 1:
+                fase_aresta = dados["numeros_fase"][0] if dados["numeros_fase"] else None
+                if fase_do_trecho is None:
+                    fase_do_trecho = fase_aresta
+                if fase_aresta != fase_do_trecho:
+                    continue
                 visitados.add(vizinho)
                 pilha.append(vizinho)
             elif dados["tipo"] == "transformador":
