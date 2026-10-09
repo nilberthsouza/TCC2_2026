@@ -1,5 +1,5 @@
 Clear
-New Circuit.MINI_1F basekv=7.967434 bus1="NODE#1987035704.2" phases=1 pu=0.990723 angle=-120.0350 frequency=60 r1=0.0 x1=0.0001
+New Circuit.MINI_1F basekv=7.967434 bus1="NODE#1987035704.2" phases=1 pu=0.988745 angle=-120.2111 frequency=60 r1=0.0 x1=0.0001
 Redirect "linecodes_extraido.dss"
 Redirect "transformadores_extraido.dss"
 Redirect "linhas_extraido.dss"

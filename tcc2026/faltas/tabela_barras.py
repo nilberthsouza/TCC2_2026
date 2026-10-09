@@ -225,6 +225,7 @@ def executar_tabela_barras(pasta_saida: Path) -> dict:
     preparar_geometria_referencia()
 
     dss = dss_core.compilar_alimentador()
+    impedancia_fonte = dss_core.calcular_impedancia_equivalente_subestacao()
     dss_core.definir_modo_instantaneo(dss)
     if not dss_core.resolver_fluxo_potencia(dss):
         raise RuntimeError("Fluxo de potencia nao convergiu no ponto de operacao padrao.")
@@ -248,6 +249,7 @@ def executar_tabela_barras(pasta_saida: Path) -> dict:
         "caso_1": selecao["caso_1"], "caso_2": selecao["caso_2"], "caso_3": selecao["caso_3"],
         "ultima_carga_caso_3": selecao["ultima_carga_caso_3"],
     }]).to_csv(pasta_saida / "barras_selecionadas.csv", index=False)
+    pd.DataFrame([impedancia_fonte]).to_csv(pasta_saida / "impedancia_subestacao.csv", index=False)
 
     tabela_principal_latex = tabela_principal.copy()
     tabela_principal_latex["z1_thevenin_ohm"] = tabela_principal_latex["z1_thevenin_ohm"].apply(

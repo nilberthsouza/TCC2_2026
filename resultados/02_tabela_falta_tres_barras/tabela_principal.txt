@@ -8,9 +8,9 @@
     \toprule
     \textbf{Caso} & \textbf{Barra} & \textbf{Dist. (km)} & \textbf{V (pu)} & \textbf{I (A)} & \textbf{Z1 Th. (Ω)} & \textbf{Z0 Th. (Ω)} & \textbf{Icc 3φ (A)} & \textbf{Icc 1φ-T (A)} \\
     \midrule
-    Caso 1 — primeira barra com carga & NODE#2566408161 & 0{,}751 & 0{,}9994 & 0{,}03 & 0{,}230 + j0{,}280 & 1{,}932 + j5{,}692 & 21936{,}2 & 3566{,}7 \\
-    Caso 2 — barra com carga mais distante & NODE#445010762 & 8{,}399 & 0{,}9902 & 0{,}06 & 7{,}693 + j4{,}518 & 3{,}298 + j8{,}787 & 881{,}5 & 912{,}3 \\
-    Caso 3 — folha sem carga & NODE#1194264563 & 8{,}079 & 0{,}9902 & 0{,}00 & 7{,}179 + j4{,}351 & 3{,}240 + j8{,}658 & 936{,}8 & 953{,}0 \\
+    Caso 1 — primeira barra com carga & NODE#2566408161 & 0{,}751 & 0{,}9977 & 0{,}03 & 0{,}388 + j1{,}992 & 0{,}286 + j1{,}514 & 3913{,}8 & 4254{,}6 \\
+    Caso 2 — barra com carga mais distante & NODE#445010762 & 8{,}399 & 0{,}9885 & 0{,}06 & 7{,}853 + j6{,}198 & 1{,}651 + j4{,}609 & 784{,}2 & 967{,}2 \\
+    Caso 3 — folha sem carga & NODE#1194264563 & 8{,}079 & 0{,}9886 & 0{,}00 & 7{,}339 + j6{,}031 & 1{,}594 + j4{,}480 & 825{,}9 & 1012{,}8 \\
     \bottomrule
   \end{tabular}
 \end{table}

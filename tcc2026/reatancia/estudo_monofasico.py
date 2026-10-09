@@ -12,6 +12,7 @@ import seaborn as sns
 
 from tcc2026.extracao import extrator_trecho as et
 from tcc2026.nucleo import dss_core, falta_injecao as fi, graficos, grafo_alimentador as ga, latex_utils, metricas
+from tcc2026.nucleo import mapa_geografico as mg
 from tcc2026.reatancia import metodo_reatancia as mr
 
 RF_PADRAO_OHM = 0.01
@@ -244,6 +245,13 @@ def plotar_mapas_trecho(grafo_completo, barras_sub: set, pasta_saida: Path) -> N
     graficos.salvar_figura(
         fig, pasta_saida / "trecho_destacado_no_alimentador.png",
         "Trecho monofásico (vermelho) destacado na topologia completa do alimentador (layout esquemático)."
+    )
+
+    coordenadas = mg.carregar_coordenadas()
+    mg.plotar_mapa_geografico(
+        grafo_completo, coordenadas, pasta_saida / "trecho_destacado_geografico.png",
+        "Mapa geográfico do alimentador JMLT310, com o trecho monofásico extraído destacado em vermelho.",
+        barras_destaque=barras_sub,
     )
 
 

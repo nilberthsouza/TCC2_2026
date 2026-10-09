@@ -42,3 +42,22 @@ GEOMETRIA_LOSANGULAR_CEMIG = {
     "semi_diagonal_horizontal_m": 0.125,
     "semi_diagonal_vertical_m": 0.20,
 }
+
+# Dados reais da subestacao que alimenta o JMLT310 (EPE-DEE-NT-094/2017):
+# potencia de curto-circuito no barramento de 69 kV, e transformador
+# 69/13.8 kV da subestacao (ha 3 transformadores iguais atendendo 9
+# alimentadores ao todo; o JMLT310 e atendido por um deles). O percentual
+# de impedancia do transformador (%Z) e a relacao X/R nao constam nos
+# dados fornecidos; adotam-se valores tipicos de catalogo para essa classe
+# de transformador (8% e X/R=8, respectivamente), documentados aqui para
+# que possam ser substituidos caso o dado real seja obtido.
+SUBESTACAO = {
+    "tensao_primario_kv": 69.0,
+    "tensao_secundario_kv": 13.8,
+    "potencia_curto_circuito_mva": 375.0,
+    "potencia_trafo_mva": 12.5,
+    "percentual_impedancia_trafo": 0.08,
+    "relacao_xr_trafo": 8.0,
+    "num_transformadores": 3,
+    "num_alimentadores": 9,
+}

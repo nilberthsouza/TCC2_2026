@@ -13,6 +13,7 @@ import seaborn as sns
 from tcc2026.nucleo import dss_core, geometria_eletrica as ge
 from tcc2026.nucleo import grafo_alimentador as ga
 from tcc2026.nucleo import graficos, latex_utils
+from tcc2026.nucleo import mapa_geografico as mg
 
 
 def resumo_fluxo_potencia(pasta_saida: Path) -> dict:
@@ -185,6 +186,29 @@ def analise_topologia(pasta_saida: Path) -> dict:
     return resumo
 
 
+def mapa_geral(pasta_saida: Path) -> Path:
+    """
+    Gera o mapa geografico do alimentador completo (sem nenhum trecho
+    destacado), a partir das coordenadas de barras do alimentador
+    (buscoords.csv).
+
+    Entradas:
+        pasta_saida: pasta onde salvar "mapa_alimentador.png".
+    Saida:
+        Path da figura gerada.
+    """
+    dss = dss_core.compilar_alimentador()
+    grafo_completo = ga.construir_grafo_eletrico(dss)
+    origem = ga.obter_barra_origem(dss)
+    grafo = ga.componente_conexa_da_origem(grafo_completo, origem)
+    coordenadas = mg.carregar_coordenadas()
+    return mg.plotar_mapa_geografico(
+        grafo, coordenadas, pasta_saida / "mapa_alimentador.png",
+        "Mapa geográfico do alimentador JMLT310 reduzido (origem em azul).",
+        barra_origem=origem,
+    )
+
+
 def executar_visao_geral(pasta_saida: Path) -> dict:
     """
     Executa a visao geral completa do alimentador: fluxo de potencia,
@@ -202,4 +226,5 @@ def executar_visao_geral(pasta_saida: Path) -> dict:
     fluxo = resumo_fluxo_potencia(pasta_saida)
     curva = curvas_diarias(pasta_saida)
     topologia = analise_topologia(pasta_saida)
+    mapa_geral(pasta_saida)
     return {"fluxo_potencia": fluxo, "curva_horaria": curva, "topologia": topologia}

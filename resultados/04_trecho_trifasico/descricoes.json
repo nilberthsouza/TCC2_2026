@@ -6,5 +6,6 @@
   "reatancia_real_vs_estimado.png": "Distância real x estimada no trecho trifásico, para as 5 variantes do método da reatância.",
   "reatancia_boxplot.png": "Distribuição do erro (estimado − real) das 5 variantes do método da reatância, lado a lado.",
   "trecho_isolado.png": "Topologia esquemática (layout de grafo, não geográfico) do trecho trifásico extraído.",
-  "trecho_destacado_no_alimentador.png": "Trecho trifásico (vermelho) destacado na topologia completa do alimentador (layout esquemático)."
+  "trecho_destacado_no_alimentador.png": "Trecho trifásico (vermelho) destacado na topologia completa do alimentador (layout esquemático).",
+  "trecho_destacado_geografico.png": "Mapa geográfico do alimentador JMLT310, com o trecho trifásico extraído destacado em vermelho."
 }

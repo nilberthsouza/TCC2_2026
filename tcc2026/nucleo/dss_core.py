@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 import py_dss_interface
 
-from tcc2026.configuracao import NUMERO_DU_PADRAO, PASTA_ALIMENTADOR_REDUZIDO
+from tcc2026.configuracao import NUMERO_DU_PADRAO, PASTA_ALIMENTADOR_REDUZIDO, SUBESTACAO
 
 
 def localizar_master(pasta_rede: Path = PASTA_ALIMENTADOR_REDUZIDO,
@@ -32,21 +32,34 @@ def localizar_master(pasta_rede: Path = PASTA_ALIMENTADOR_REDUZIDO,
     return candidatos[0]
 
 
-def compilar_alimentador(caminho_master: Path | None = None) -> py_dss_interface.DSS:
+def compilar_alimentador(caminho_master: Path | None = None,
+                          aplicar_impedancia_real: bool = True) -> py_dss_interface.DSS:
     """
     Compila o alimentador no motor OpenDSS a partir do arquivo Master.
+
+    Por padrao, substitui a fonte equivalente (quase ideal nos arquivos
+    originais da BDGD) pela impedancia real da subestacao a montante (ver
+    aplicar_impedancia_fonte_real), de modo que todas as secoes do trabalho
+    (tabela de barras, estudos de trecho, Takagi, reatancia) usem o mesmo
+    modelo consistente de fonte.
 
     Entradas:
         caminho_master: caminho do Master*.dss; se None, usa o Master padrao
             configurado em tcc2026.configuracao.
+        aplicar_impedancia_real: se True (padrao), aplica a impedancia real
+            da subestacao logo apos compilar. Usar False apenas em calculos
+            auxiliares que nao dependem da fonte (ex.: geometria de
+            referencia em componente isolado).
     Saida:
-        instancia py_dss_interface.DSS com o circuito compilado e resolvido
-        uma vez no modo definido pelo proprio Master (daily, passo 1h).
+        instancia py_dss_interface.DSS com o circuito compilado (fonte
+        equivalente ja ajustada, se aplicar_impedancia_real=True).
     """
     if caminho_master is None:
         caminho_master = localizar_master()
     dss = py_dss_interface.DSS()
     dss.text(f'compile "{caminho_master}"')
+    if aplicar_impedancia_real:
+        aplicar_impedancia_fonte_real(dss)
     return dss
 
 
@@ -69,6 +82,80 @@ def definir_modo_instantaneo(dss: py_dss_interface.DSS) -> None:
     dss.text("set maxiterations=100")
     dss.text("set number=1")
     dss.text("set hour=0")
+
+
+def calcular_impedancia_equivalente_subestacao(dados_subestacao: dict = SUBESTACAO) -> dict:
+    """
+    Calcula a impedancia de Thevenin equivalente, no lado de 13,8 kV, do
+    sistema a montante da subestacao (refletida do barramento de 69 kV)
+    em serie com o transformador 69/13,8 kV, a partir da potencia de
+    curto-circuito do sistema e dos dados de placa do transformador.
+
+    O percentual de impedancia do transformador e a relacao X/R nao
+    constam nos dados de origem; valores tipicos de catalogo (8%, X/R=8)
+    sao adotados como referencia (ver tcc2026.configuracao.SUBESTACAO).
+
+    Entradas:
+        dados_subestacao: dicionario com tensao_primario_kv,
+            tensao_secundario_kv, potencia_curto_circuito_mva,
+            potencia_trafo_mva, percentual_impedancia_trafo e
+            relacao_xr_trafo (ver tcc2026.configuracao.SUBESTACAO).
+    Saida:
+        dicionario com r1_ohm, x1_ohm (sequencia positiva, lado 13,8 kV) e
+        r0_ohm, x0_ohm (sequencia zero, aproximada pela impedancia do
+        proprio transformador, assumindo conexao Delta-Estrela aterrada
+        que bloqueia a contribuicao de sequencia zero do sistema a
+        montante).
+    """
+    v_pri = dados_subestacao["tensao_primario_kv"]
+    v_sec = dados_subestacao["tensao_secundario_kv"]
+    scc_mva = dados_subestacao["potencia_curto_circuito_mva"]
+    s_trafo_mva = dados_subestacao["potencia_trafo_mva"]
+    pct_z = dados_subestacao["percentual_impedancia_trafo"]
+    xr = dados_subestacao["relacao_xr_trafo"]
+
+    z_sistema_69kv_ohm = v_pri ** 2 / scc_mva
+    z_sistema_13kv_ohm = z_sistema_69kv_ohm * (v_sec / v_pri) ** 2
+
+    z_base_trafo_ohm = v_sec ** 2 / s_trafo_mva
+    z_trafo_ohm = pct_z * z_base_trafo_ohm
+    r_trafo_ohm = z_trafo_ohm / (1 + xr ** 2) ** 0.5
+    x_trafo_ohm = xr * r_trafo_ohm
+
+    r1_ohm = r_trafo_ohm
+    x1_ohm = z_sistema_13kv_ohm + x_trafo_ohm
+    return {
+        "r1_ohm": r1_ohm,
+        "x1_ohm": x1_ohm,
+        "r0_ohm": r_trafo_ohm,
+        "x0_ohm": x_trafo_ohm,
+    }
+
+
+def aplicar_impedancia_fonte_real(dss: py_dss_interface.DSS,
+                                   impedancia: dict | None = None) -> dict:
+    """
+    Substitui a impedancia da fonte equivalente do circuito compilado
+    (elemento Vsource.source, originalmente quase ideal nos arquivos da
+    BDGD) pela impedancia real da subestacao (ver
+    calcular_impedancia_equivalente_subestacao). Deve ser chamada logo
+    apos compilar_alimentador() e antes de resolver_fluxo_potencia().
+
+    Entradas:
+        dss: instancia do motor OpenDSS, recem compilada.
+        impedancia: dicionario com r1_ohm, x1_ohm, r0_ohm, x0_ohm; se None,
+            calculada a partir de tcc2026.configuracao.SUBESTACAO.
+    Saida:
+        o dicionario de impedancia efetivamente aplicado.
+    """
+    if impedancia is None:
+        impedancia = calcular_impedancia_equivalente_subestacao()
+    dss.text(
+        f"Edit Vsource.source "
+        f"r1={impedancia['r1_ohm']:.6f} x1={impedancia['x1_ohm']:.6f} "
+        f"r0={impedancia['r0_ohm']:.6f} x0={impedancia['x0_ohm']:.6f}"
+    )
+    return impedancia
 
 
 def resolver_fluxo_potencia(dss: py_dss_interface.DSS) -> bool:

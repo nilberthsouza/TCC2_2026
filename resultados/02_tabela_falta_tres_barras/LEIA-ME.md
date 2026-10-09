@@ -38,14 +38,26 @@ Gerado por `tcc2026.faltas.tabela_barras.executar_tabela_barras`.
 - `tabela_cargas_concentradas.csv`/`.txt`: potência ativa e reativa (QL
   indutivo / Qc capacitivo) e corrente média a jusante de cada ponto de
   carga concentrada.
+- `impedancia_subestacao.csv`: impedância de Thevenin equivalente da
+  subestação (r1/x1/r0/x0, Ω, base 13,8 kV) aplicada à fonte do circuito —
+  ver observação abaixo.
 
-## Observação sobre a corrente de curto-circuito próxima à origem
+## Observação sobre a impedância da fonte equivalente
 
-O `New Circuit...` do alimentador usa uma fonte praticamente ideal
-(`r1=0, x1=0.0001`), sem impedância de transformador de subestação
-modelada. Por isso a corrente de curto trifásico no Caso 1 (próximo à
-origem, Z1 ≈ 0,23+j0,28 Ω) sai bem mais alta (≈ 22 kA) que nos Casos 2 e 3
-(≈ 0,9 kA), já distantes o bastante para a impedância da linha dominar. Isso
-é uma característica do modelo fornecido (sem limitação de curto pela
-subestação), não um erro de cálculo — vale mencionar essa limitação no
-texto do TCC se os valores do Caso 1 forem usados para dimensionar proteção.
+O `New Circuit...` do alimentador, tal como exportado da BDGD, usa uma
+fonte praticamente ideal (`r1=0, x1=0.0001`), sem impedância de
+transformador de subestação modelada. Isso foi corrigido: antes de
+resolver o fluxo de potência, `dss_core.compilar_alimentador()` substitui
+a fonte pela impedância de Thevenin real da subestação que atende o
+JMLT310 (375 MVA de curto-circuito em 69 kV, transformador 69/13,8 kV de
+12,5 MVA — ver `tcc2026.configuracao.SUBESTACAO` e
+`dss_core.calcular_impedancia_equivalente_subestacao`), aplicada de forma
+centralizada a **todas** as seções deste trabalho, não apenas a esta
+tabela.
+
+Com a correção, a corrente de curto trifásico no Caso 1 (próximo à
+origem, Z1 ≈ 0,39+j1,99 Ω) cai de ≈ 22 kA (fonte ideal) para ≈ 3,9 kA —
+valor agora compatível com o de um alimentador real de média tensão —
+permanecendo mais elevada que nos Casos 2 e 3 (≈ 0,8 kA) por ser a barra
+com a menor impedância de linha acumulada entre a fonte e o ponto de
+falta.
