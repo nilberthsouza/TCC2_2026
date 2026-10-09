@@ -1,0 +1,91 @@
+barra,metodo,distancia_real_km,distancia_estimada_km,rotulo_metodo,erro_km
+NODE#1194264563,original_sem_carga,0.72932,1.734337405128039,"Sem compensação, sem cargas",1.005017405128039
+NODE#1194264563,compensado_sem_carga,0.72932,0.5805228591264527,"Compensação K0, sem cargas",-0.14879714087354723
+NODE#1194264563,compensado_corrigido_sem_carga,0.72932,0.9286857597546744,"Compensação K0 + correção do offset, sem cargas",0.1993657597546744
+NODE#1194264563,original_com_carga,0.72932,1.7341658958780495,"Sem compensação, com cargas",1.0048458958780495
+NODE#1194264563,compensado_com_carga,0.72932,0.5805026356671478,"Compensação K0, com cargas",-0.1488173643328522
+NODE#1856060650,original_sem_carga,0.36872,0.8768199652430624,"Sem compensação, sem cargas",0.5080999652430624
+NODE#1856060650,compensado_sem_carga,0.36872,0.29025088320201714,"Compensação K0, sem cargas",-0.07846911679798285
+NODE#1856060650,compensado_corrigido_sem_carga,0.36872,0.4695105648862186,"Compensação K0 + correção do offset, sem cargas",0.10079056488621863
+NODE#1856060650,original_com_carga,0.36872,0.8767398851659929,"Sem compensação, com cargas",0.508019885165993
+NODE#1856060650,compensado_com_carga,0.36872,0.2902388790744729,"Compensação K0, com cargas",-0.07848112092552711
+NODE#433472213,original_sem_carga,0.0627,0.08744741246714245,"Sem compensação, sem cargas",0.024747412467142446
+NODE#433472213,compensado_sem_carga,0.0627,-0.025716132932257243,"Compensação K0, sem cargas",-0.08841613293225725
+NODE#433472213,compensado_corrigido_sem_carga,0.0627,0.046826818106213655,"Compensação K0 + correção do offset, sem cargas",-0.01587318189378635
+NODE#433472213,original_com_carga,0.0627,0.08744471373957088,"Sem compensação, com cargas",0.02474471373957088
+NODE#433472213,compensado_com_carga,0.0627,-0.02571618247521639,"Compensação K0, com cargas",-0.0884161824752164
+NODE#433472239,original_sem_carga,0.17034,0.2386419054029209,"Sem compensação, sem cargas",0.06830190540292091
+NODE#433472239,compensado_sem_carga,0.17034,-0.01739478890468795,"Compensação K0, sem cargas",-0.18773478890468795
+NODE#433472239,compensado_corrigido_sem_carga,0.17034,0.12778804302295368,"Compensação K0 + correção do offset, sem cargas",-0.04255195697704631
+NODE#433472239,original_com_carga,0.17034,0.23863442178052982,"Sem compensação, com cargas",0.06829442178052983
+NODE#433472239,compensado_com_carga,0.17034,-0.01739507156352423,"Compensação K0, com cargas",-0.18773507156352423
+NODE#433472689,original_sem_carga,0.9646699999999999,2.0653320002216153,"Sem compensação, sem cargas",1.1006620002216154
+NODE#433472689,compensado_sem_carga,0.9646699999999999,0.6287021161269049,"Compensação K0, sem cargas",-0.33596788387309506
+NODE#433472689,compensado_corrigido_sem_carga,0.9646699999999999,1.1059240785021858,"Compensação K0 + correção do offset, sem cargas",0.14125407850218585
+NODE#433472689,original_com_carga,0.9646699999999999,2.06503003846888,"Sem compensação, com cargas",1.1003600384688799
+NODE#433472689,compensado_com_carga,0.9646699999999999,0.6286484654512581,"Compensação K0, com cargas",-0.33602153454874184
+NODE#433472718,original_sem_carga,0.72732,1.7295814270293994,"Sem compensação, sem cargas",1.0022614270293995
+NODE#433472718,compensado_sem_carga,0.72732,0.5789129441387455,"Compensação K0, sem cargas",-0.14840705586125447
+NODE#433472718,compensado_corrigido_sem_carga,0.72732,0.9261390721990981,"Compensação K0 + correção do offset, sem cargas",0.1988190721990981
+NODE#433472718,original_com_carga,0.72732,1.7294018114877874,"Sem compensação, com cargas",1.0020818114877874
+NODE#433472718,compensado_com_carga,0.72732,0.5788806384979059,"Compensação K0, com cargas",-0.14843936150209402
+NODE#433472719,original_sem_carga,0.74744,1.7774266324753778,"Sem compensação, sem cargas",1.029986632475378
+NODE#433472719,compensado_sem_carga,0.74744,0.5951087199695572,"Compensação K0, sem cargas",-0.15233128003044283
+NODE#433472719,compensado_corrigido_sem_carga,0.74744,0.9517587817358911,"Compensação K0 + correção do offset, sem cargas",0.20431878173589113
+NODE#433472719,original_com_carga,0.74744,1.7772270674263653,"Sem compensação, com cargas",1.0297870674263652
+NODE#433472719,compensado_com_carga,0.74744,0.5950743169177849,"Compensação K0, com cargas",-0.1523656830822151
+NODE#433473112,original_sem_carga,0.6994699999999999,1.6633543136206168,"Sem compensação, sem cargas",0.9638843136206169
+NODE#433473112,compensado_sem_carga,0.6994699999999999,0.5564948093922405,"Compensação K0, sem cargas",-0.14297519060775943
+NODE#433473112,compensado_corrigido_sem_carga,0.6994699999999999,0.8906763924958523,"Compensação K0 + correção do offset, sem cargas",0.19120639249585236
+NODE#433473112,original_com_carga,0.6994699999999999,1.6631215929070267,"Sem compensação, com cargas",0.9636515929070267
+NODE#433473112,compensado_com_carga,0.6994699999999999,0.5564536298826831,"Compensação K0, com cargas",-0.14301637011731683
+NODE#433473407,original_sem_carga,0.7943799999999999,1.7957066938080255,"Sem compensação, sem cargas",1.0013266938080256
+NODE#433473407,compensado_sem_carga,0.7943799999999999,0.5274919516221942,"Compensação K0, sem cargas",-0.26688804837780566
+NODE#433473407,compensado_corrigido_sem_carga,0.7943799999999999,0.9615480923786714,"Compensação K0 + correção do offset, sem cargas",0.16716809237867158
+NODE#433473407,original_com_carga,0.7943799999999999,1.7952579065998302,"Sem compensação, com cargas",1.0008779065998303
+NODE#433473407,compensado_com_carga,0.7943799999999999,0.5274359059738737,"Compensação K0, com cargas",-0.2669440940261262
+NODE#445010391,original_sem_carga,0.39320999999999995,0.935062602269389,"Sem compensação, sem cargas",0.541852602269389
+NODE#445010391,compensado_sem_carga,0.39320999999999995,0.30996583357941376,"Compensação K0, sem cargas",-0.08324416642058619
+NODE#445010391,compensado_corrigido_sem_carga,0.39320999999999995,0.5006977578113009,"Compensação K0 + correção do offset, sem cargas",0.10748775781130093
+NODE#445010391,original_com_carga,0.39320999999999995,0.934975314284381,"Sem compensação, com cargas",0.541765314284381
+NODE#445010391,compensado_com_carga,0.39320999999999995,0.30996123549592214,"Compensação K0, com cargas",-0.08324876450407781
+NODE#445010711,original_sem_carga,0.17872,0.4250007536069736,"Sem compensação, sem cargas",0.2462807536069736
+NODE#445010711,compensado_sem_carga,0.17872,0.1373073329152072,"Compensação K0, sem cargas",-0.0414126670847928
+NODE#445010711,compensado_corrigido_sem_carga,0.17872,0.2275751291315676,"Compensação K0 + correção do offset, sem cargas",0.048855129131567615
+NODE#445010711,original_com_carga,0.17872,0.4249757073653049,"Sem compensação, com cargas",0.2462557073653049
+NODE#445010711,compensado_com_carga,0.17872,0.1373082303234938,"Compensação K0, com cargas",-0.0414117696765062
+NODE#445010712,original_sem_carga,0.21972,0.5224988048777753,"Sem compensação, sem cargas",0.3027788048777753
+NODE#445010712,compensado_sem_carga,0.21972,0.17031110726621965,"Compensação K0, sem cargas",-0.04940889273378035
+NODE#445010712,compensado_corrigido_sem_carga,0.21972,0.2797823485814514,"Compensação K0 + correção do offset, sem cargas",0.0600623485814514
+NODE#445010712,original_com_carga,0.21972,0.5224638529350454,"Sem compensação, com cargas",0.30274385293504535
+NODE#445010712,compensado_com_carga,0.21972,0.17030947238346844,"Compensação K0, com cargas",-0.04941052761653156
+NODE#445010762,original_sem_carga,1.04941,2.4955109713104626,"Sem compensação, sem cargas",1.4461009713104627
+NODE#445010762,compensado_sem_carga,1.04941,0.8381827882656309,"Compensação K0, sem cargas",-0.2112272117343691
+NODE#445010762,compensado_corrigido_sem_carga,1.04941,1.3362720196958613,"Compensação K0 + correção do offset, sem cargas",0.28686201969586134
+NODE#445010762,original_com_carga,1.04941,2.495201947544276,"Sem compensação, com cargas",1.4457919475442762
+NODE#445010762,compensado_com_carga,1.04941,0.8381371754564698,"Compensação K0, com cargas",-0.21127282454353014
+NODE#445010976,original_sem_carga,0.8706299999999999,2.0703735947327715,"Sem compensação, sem cargas",1.1997435947327717
+NODE#445010976,compensado_sem_carga,0.8706299999999999,0.6942727249075921,"Compensação K0, sem cargas",-0.17635727509240784
+NODE#445010976,compensado_corrigido_sem_carga,0.8706299999999999,1.1086232303882457,"Compensação K0 + correção do offset, sem cargas",0.23799323038824582
+NODE#445010976,original_com_carga,0.8706299999999999,2.070152455111808,"Sem compensação, com cargas",1.1995224551118082
+NODE#445010976,compensado_com_carga,0.8706299999999999,0.694243503985565,"Compensação K0, com cargas",-0.1763864960144349
+NODE#445010992,original_sem_carga,0.64077,1.5237648030354856,"Sem compensação, sem cargas",0.8829948030354856
+NODE#445010992,compensado_sem_carga,0.64077,0.5092433151498387,"Compensação K0, sem cargas",-0.13152668485016128
+NODE#445010992,compensado_corrigido_sem_carga,0.64077,0.815930314789698,"Compensação K0 + correção do offset, sem cargas",0.17516031478969807
+NODE#445010992,original_com_carga,0.64077,1.5237472463034027,"Sem compensação, com cargas",0.8829772463034028
+NODE#445010992,compensado_com_carga,0.64077,0.5092431404450417,"Compensação K0, com cargas",-0.13152685955495824
+NODE#445011621,original_sem_carga,0.52801,1.2556195395123786,"Sem compensação, sem cargas",0.7276095395123786
+NODE#445011621,compensado_sem_carga,0.52801,0.4184754859591523,"Compensação K0, sem cargas",-0.10953451404084769
+NODE#445011621,compensado_corrigido_sem_carga,0.52801,0.6723464285587433,"Compensação K0 + correção do offset, sem cargas",0.1443364285587433
+NODE#445011621,original_com_carga,0.52801,1.2556031923789428,"Sem compensação, com cargas",0.7275931923789428
+NODE#445011621,compensado_com_carga,0.52801,0.4184755306746278,"Compensação K0, com cargas",-0.1095344693253722
+NODE#445011831,original_sem_carga,0.6045499999999999,1.3623677125177778,"Sem compensação, sem cargas",0.7578177125177779
+NODE#445011831,compensado_sem_carga,0.6045499999999999,0.3950915768294833,"Compensação K0, sem cargas",-0.2094584231705166
+NODE#445011831,compensado_corrigido_sem_carga,0.6045499999999999,0.7295116264195031,"Compensação K0 + correção do offset, sem cargas",0.12496162641950315
+NODE#445011831,original_com_carga,0.6045499999999999,1.3621983694946658,"Sem compensação, com cargas",0.7576483694946659
+NODE#445011831,compensado_com_carga,0.6045499999999999,0.3950673079185192,"Compensação K0, com cargas",-0.20948269208148074
+NODE#445011866,original_sem_carga,1.00467,2.121116638341907,"Sem compensação, sem cargas",1.1164466383419072
+NODE#445011866,compensado_sem_carga,1.00467,0.6164793703818945,"Compensação K0, sem cargas",-0.38819062961810546
+NODE#445011866,compensado_corrigido_sem_carga,1.00467,1.1357966489052957,"Compensação K0 + correção do offset, sem cargas",0.1311266489052958
+NODE#445011866,original_com_carga,1.00467,2.1208291817814766,"Sem compensação, com cargas",1.1161591817814767
+NODE#445011866,compensado_com_carga,1.00467,0.6164324196918134,"Compensação K0, com cargas",-0.38823758030818656

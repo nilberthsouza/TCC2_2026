@@ -278,6 +278,39 @@ def selecionar_trecho_monofasico_mais_diverso(grafo: nx.Graph, barra_origem: str
     return melhor_raiz
 
 
+def selecionar_trecho_trifasico_pequeno(grafo: nx.Graph, barra_origem: str,
+                                         tamanho_min: int = 6, tamanho_max: int = 30) -> str:
+    """
+    Procura, entre as barras de ramificacao da rede trifasica, uma boa
+    raiz para um trecho trifasico pequeno com diversidade de carga: dentro
+    da faixa de tamanho de sub-arvore informada, escolhe a que tem mais
+    transformadores (maior diversidade de carga).
+
+    Entradas:
+        grafo: grafo eletrico restrito ao componente conexo da origem.
+        barra_origem: nome da barra de origem do alimentador.
+        tamanho_min, tamanho_max: faixa aceitavel de numero de barras da
+            sub-arvore (grande o suficiente para ter alguma diversidade,
+            pequena o suficiente para ser um "trecho pequeno").
+    Saida:
+        nome da barra raiz escolhida.
+    """
+    categorias = classificar_barras(grafo, barra_origem)
+    candidatas = [b for b, cat in categorias.items() if cat == "ramificacao"]
+    melhor_raiz, melhor_trafos = None, -1
+    for barra in candidatas:
+        subarvore = subarvore_a_partir_de(grafo, barra_origem, barra)
+        if not (tamanho_min <= len(subarvore) <= tamanho_max):
+            continue
+        n_trafos = sum(
+            1 for a, b, d in grafo.edges(data=True)
+            if d["tipo"] == "transformador" and (a in subarvore or b in subarvore)
+        )
+        if n_trafos > melhor_trafos:
+            melhor_raiz, melhor_trafos = barra, n_trafos
+    return melhor_raiz
+
+
 def caminho_entre_barras(grafo: nx.Graph, barra_a: str, barra_b: str) -> list:
     """
     Obtem a sequencia de barras do caminho mais curto entre duas barras.

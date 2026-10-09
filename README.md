@@ -36,8 +36,9 @@ TCC2_2026/
 │   ├── extracao/
 │   │   └── extrator_trecho.py  # extrai um ramal como mini-alimentador .dss standalone
 │   ├── reatancia/                # Secao 3/4: metodo da reatancia aparente
-│   │   ├── metodo_reatancia.py   # formulas (simples; compensacao K0 na Secao 4)
-│   │   └── estudo_monofasico.py  # orquestra a Secao 3 (trecho monofasico)
+│   │   ├── metodo_reatancia.py   # formulas: simples, compensacao K0, correcao de offset
+│   │   ├── estudo_monofasico.py  # orquestra a Secao 3 (trecho monofasico)
+│   │   └── estudo_trifasico.py   # orquestra a Secao 4 (trecho trifasico, 5 variantes)
 │   ├── takagi/                   # metodo de Takagi (corrente e tensao, compensado)
 │   └── resistencia_falta/        # efeito da resistencia de falta (Rf) na distancia estimada
 └── resultados/                  # saida de cada secao: CSVs, graficos .png e tabelas .tex/.txt
@@ -122,6 +123,10 @@ logo em seguida.
 - [x] Seção 3 — Trecho monofásico: extração automática do ramal mais
       diverso, fluxo de potência, curva horária e método da reatância
       simples (sem/com cargas) — ver `resultados/03_trecho_monofasico/LEIA-ME.md`.
+- [x] Seção 4 — Trecho trifásico: extração com geometria Cemig aplicada,
+      fluxo/curva horária e as 5 variantes do método da reatância
+      (com/sem carga × com/sem compensação K0 × correção do offset) —
+      ver `resultados/04_trecho_trifasico/LEIA-ME.md`.
 - [ ] Seção 3 — Trecho monofásico: extração, fluxo, reatância aparente.
 - [ ] Seção 4 — Trecho trifásico: extração, reatância com/sem compensação.
 - [ ] Seção 5 — Efeito da resistência de falta.

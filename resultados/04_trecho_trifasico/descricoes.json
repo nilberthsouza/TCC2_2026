@@ -1,0 +1,10 @@
+{
+  "curva_potencia_ativa.png": "Curva horária de potência ativa do trecho trifásico extraído (kW), 24 h.",
+  "curva_potencia_reativa.png": "Curva horária de potência reativa do trecho trifásico extraído (kvar), 24 h.",
+  "curva_perdas.png": "Curva horária de perdas ativas do trecho trifásico extraído (kW), 24 h.",
+  "curva_tensao_media.png": "Curva horária da tensão média nas barras do trecho trifásico extraído (pu), 24 h.",
+  "reatancia_real_vs_estimado.png": "Distância real x estimada no trecho trifásico, para as 5 variantes do método da reatância.",
+  "reatancia_boxplot.png": "Distribuição do erro (estimado − real) das 5 variantes do método da reatância, lado a lado.",
+  "trecho_isolado.png": "Topologia esquemática (layout de grafo, não geográfico) do trecho trifásico extraído.",
+  "trecho_destacado_no_alimentador.png": "Trecho trifásico (vermelho) destacado na topologia completa do alimentador (layout esquemático)."
+}

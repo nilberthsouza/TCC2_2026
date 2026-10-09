@@ -1,0 +1,18 @@
+% Contexto: Secao 4 - metricas de erro das 5 variantes do metodo da reatancia no trecho trifasico.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Erros das 5 variantes do método da reatância no trecho trifásico}
+  \label{tab:reatancia_3f_metricas}
+  \begin{tabular}{lcccccccc}
+    \toprule
+    \textbf{Método} & \textbf{MAE (km)} & \textbf{RMSE (km)} & \textbf{R²} & \textbf{Erro Máx. (km)} & \textbf{Erro Máx. (\%)} & \textbf{Erro Médio (km)} & \textbf{Erro Médio (\%)} & \textbf{Desvio Padrão (km)} \\
+    \midrule
+    Sem compensação, sem cargas & 0{,}7737 & 0{,}8689 & -7{,}6403 & 1{,}4461 & 137{,}8013 & 0{,}7737 & 73{,}7235 & 0{,}3954 \\
+    Sem compensação, com cargas & 0{,}7735 & 0{,}8687 & -7{,}6366 & 1{,}4458 & 137{,}7719 & 0{,}7735 & 73{,}7087 & 0{,}3953 \\
+    Compensação K0, sem cargas & 0{,}1639 & 0{,}1874 & 0{,}5983 & 0{,}3882 & 36{,}9913 & -0{,}1639 & -15{,}6191 & 0{,}0907 \\
+    Compensação K0, com cargas & 0{,}1639 & 0{,}1874 & 0{,}5982 & 0{,}3882 & 36{,}9958 & -0{,}1639 & -15{,}6212 & 0{,}0908 \\
+    Compensação K0 + correção do offset, sem cargas & 0{,}1432 & 0{,}1596 & 0{,}7085 & 0{,}2869 & 27{,}3356 & 0{,}1367 & 13{,}0303 & 0{,}0823 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

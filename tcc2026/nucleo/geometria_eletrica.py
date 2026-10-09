@@ -59,6 +59,41 @@ def matriz_fase_para_sequencia_1x(zabc_ohm_km: np.ndarray) -> tuple[complex, com
     return complex(z0), complex(z1), complex(z2)
 
 
+def texto_definicao_geometria_losangular_cemig(nome_geometria: str = "GEOM_LOSANG_CEMIG",
+                                                nome_condutor: str = "COND_REF_CEMIG") -> list[str]:
+    """
+    Gera as linhas de texto DSS (WireData + LineGeometry) da geometria em
+    espacador losangular padrao Cemig, prontas para serem escritas em um
+    arquivo .dss ou enviadas via dss.text(). Usada tanto para calcular os
+    parametros de sequencia de referencia (ver
+    calcular_parametros_sequencia_losangular_cemig) quanto para aplicar a
+    geometria as linhas reais de um trecho extraido (ver
+    tcc2026.extracao.extrator_trecho.aplicar_geometria_cemig_as_linhas).
+
+    Entradas:
+        nome_geometria: nome do objeto LineGeometry a criar.
+        nome_condutor: nome do objeto WireData a criar.
+    Saida:
+        lista de linhas de texto DSS (sem quebras de linha).
+    """
+    c = CONDUTOR_REFERENCIA
+    g = GEOMETRIA_LOSANGULAR_CEMIG
+    h = g["altura_base_m"]
+    dx = g["semi_diagonal_horizontal_m"]
+    dy = g["semi_diagonal_vertical_m"]
+    return [
+        f'New wiredata.{nome_condutor} Rdc={c["rdc_ohm_km"]} Rac={c["rac_ohm_km"]} '
+        f'GMRac={c["gmr_m"]} GMRunits=m Radius={c["raio_m"]} Diam={c["diametro_m"]} '
+        f'radunits=m normamps={c["normamps"]} runits=km',
+        f'New linegeometry.{nome_geometria} nconds=4 nphases=3 reduce=yes',
+        f'~ cond=1 wire={nome_condutor} x={dx}  h={h}',        # fase A (direita)
+        f'~ cond=2 wire={nome_condutor} x={-dx} h={h}',        # fase B (esquerda)
+        f'~ cond=3 wire={nome_condutor} x=0.0   h={h - dy}',   # fase C (base do losango)
+        f'~ cond=4 wire={nome_condutor} x=0.0   h={h + dy}',   # neutro/mensageiro (topo)
+        '~ units=m',
+    ]
+
+
 @lru_cache(maxsize=1)
 def calcular_parametros_sequencia_losangular_cemig(nome_geometria: str = "GEOM_LOSANG_CEMIG",
                                                     nome_condutor: str = "COND_REF_CEMIG") -> dict:
@@ -85,25 +120,11 @@ def calcular_parametros_sequencia_losangular_cemig(nome_geometria: str = "GEOM_L
         c1_nf_km, c0_nf_km (nF/km), validos para qualquer trecho MT trifasico
         que adote essa mesma geometria de referencia.
     """
-    c = CONDUTOR_REFERENCIA
-    g = GEOMETRIA_LOSANGULAR_CEMIG
     dss_aux = py_dss_interface.DSS()
     dss_aux.text("clear")
     dss_aux.text("new circuit.aux_geometria basekv=13.8 bus1=aux1 pu=1.0")
-    dss_aux.text(
-        f'new wiredata.{nome_condutor} Rdc={c["rdc_ohm_km"]} Rac={c["rac_ohm_km"]} '
-        f'GMRac={c["gmr_m"]} GMRunits=m Radius={c["raio_m"]} Diam={c["diametro_m"]} '
-        f'radunits=m normamps={c["normamps"]} runits=km'
-    )
-    h = g["altura_base_m"]
-    dx = g["semi_diagonal_horizontal_m"]
-    dy = g["semi_diagonal_vertical_m"]
-    dss_aux.text(f'new linegeometry.{nome_geometria} nconds=4 nphases=3 reduce=yes')
-    dss_aux.text(f'~ cond=1 wire={nome_condutor} x={dx}  h={h}')       # fase A (direita)
-    dss_aux.text(f'~ cond=2 wire={nome_condutor} x={-dx} h={h}')       # fase B (esquerda)
-    dss_aux.text(f'~ cond=3 wire={nome_condutor} x=0.0   h={h - dy}')  # fase C (base do losango)
-    dss_aux.text(f'~ cond=4 wire={nome_condutor} x=0.0   h={h + dy}')  # neutro/mensageiro (topo)
-    dss_aux.text('~ units=m')
+    for linha in texto_definicao_geometria_losangular_cemig(nome_geometria, nome_condutor):
+        dss_aux.text(linha)
     dss_aux.text(
         f'new line.linha_referencia bus1=aux1.1.2.3 bus2=aux2.1.2.3 '
         f'geometry={nome_geometria} length=1 units=km phases=3'

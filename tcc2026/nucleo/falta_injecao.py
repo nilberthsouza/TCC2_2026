@@ -123,3 +123,33 @@ def medir_tensao_corrente_rele(dss: py_dss_interface.DSS, barra_rele: str, fase:
     # injeta na rede tem sinal oposto.
     corrente_a = -complex(ce.currents[2 * indice_corrente], ce.currents[2 * indice_corrente + 1])
     return tensao_v, corrente_a
+
+
+def medir_tensoes_correntes_trifasicas_rele(dss: py_dss_interface.DSS, barra_rele: str) -> dict:
+    """
+    Le a tensao (fase-neutro, 3 fases) na barra do rele e a corrente
+    entregue pela fonte equivalente (Vsource.source) nas 3 fases, apos
+    resolver o fluxo de potencia com a falta aplicada. Usado pelos metodos
+    que precisam da corrente de sequencia zero (I0 = (Ia+Ib+Ic)/3), como a
+    compensacao K0 do metodo da reatancia e o metodo de Takagi.
+
+    Entradas:
+        dss: instancia do motor OpenDSS, ja resolvida (fluxo de potencia ou
+            falta aplicada).
+        barra_rele: nome da barra onde o rele esta instalado.
+    Saida:
+        dicionario {"tensoes": {1: V_a, 2: V_b, 3: V_c}, "correntes": {1: I_a, 2: I_b, 3: I_c}},
+        indexado pelo numero da fase (volts fase-neutro, amperes).
+    """
+    dss.circuit.set_active_bus(barra_rele)
+    bus = dss.bus
+    tensoes = {}
+    for indice, fase in enumerate(bus.nodes):
+        tensoes[int(fase)] = complex(bus.voltages[2 * indice], bus.voltages[2 * indice + 1])
+
+    dss.circuit.set_active_element("Vsource.source")
+    ce = dss.cktelement
+    correntes = {}
+    for indice, fase in enumerate(ce.node_order[:ce.num_conductors]):
+        correntes[int(fase)] = -complex(ce.currents[2 * indice], ce.currents[2 * indice + 1])
+    return {"tensoes": tensoes, "correntes": correntes}
