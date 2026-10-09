@@ -44,7 +44,7 @@ def preparar_alimentador_geometria_cemig(pasta_saida: Path, nome_circuito: str =
     origem = ga.obter_barra_origem(dss)
     caminho_master = et.extrair_subalimentador(
         dss, origem, set(grafo_completo.nodes), pasta_saida / "alimentador_geometria_cemig",
-        nome_circuito, usar_geometria_cemig_trifasica=True)
+        nome_circuito, usar_geometria_cemig_trifasica=True, usar_geometria_cemig_monofasica=True)
     return {"caminho_master": caminho_master, "origem": origem}
 
 

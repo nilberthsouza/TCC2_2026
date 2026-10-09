@@ -205,6 +205,34 @@ def converter_linhas_trifasicas_para_geometria_cemig(linhas: list[str],
     return convertidas
 
 
+def converter_linhas_monofasicas_para_geometria_cemig(linhas: list[str],
+                                                        nome_geometria: str = "GEOM_MONO_CEMIG") -> list[str]:
+    """
+    Troca, nas linhas monofasicas (phases=1), o Linecode original por
+    geometry=<nome_geometria> (laco fase-neutro de referencia Cemig).
+    Mesma motivacao de converter_linhas_trifasicas_para_geometria_cemig:
+    sem geometria propria, R0/X0 (identicos a R1/X1 pela natureza
+    monofasica do trecho, ver
+    tcc2026.nucleo.geometria_eletrica.calcular_parametros_sequencia_monofasico_cemig)
+    cairiam no valor generico padrao do OpenDSS. Trechos de 2 ou 3 fases
+    (ramais dentro do trecho monofasico) ficam com o Linecode original.
+
+    Entradas:
+        linhas: linhas de texto "New Line..."/chaves ja filtradas para o trecho.
+        nome_geometria: nome do LineGeometry a referenciar (deve ser
+            definido no arquivo redirecionado antes destas linhas, ver
+            tcc2026.nucleo.geometria_eletrica.texto_definicao_geometria_monofasica_cemig).
+    Saida:
+        lista de linhas de texto com phases=1 convertidas para geometry=.
+    """
+    convertidas = []
+    for linha in linhas:
+        if "phases=1" in linha and _PADRAO_LINECODE_3F.search(linha):
+            linha = _PADRAO_LINECODE_3F.sub(f"geometry={nome_geometria}", linha)
+        convertidas.append(linha)
+    return convertidas
+
+
 def tensao_fonte_equivalente(dss: py_dss_interface.DSS, barra_raiz: str, fases: list[int]) -> dict:
     """
     Le a tensao real (magnitude e angulo) observada na barra_raiz, nas
@@ -245,7 +273,8 @@ def extrair_subalimentador(dss: py_dss_interface.DSS, barra_raiz: str, barras_su
                             pasta_saida: Path, nome_circuito: str,
                             pasta_alimentador: Path = PASTA_ALIMENTADOR_REDUZIDO,
                             numero_du: int = NUMERO_DU_PADRAO,
-                            usar_geometria_cemig_trifasica: bool = False) -> Path:
+                            usar_geometria_cemig_trifasica: bool = False,
+                            usar_geometria_cemig_monofasica: bool = False) -> Path:
     """
     Gera, em pasta_saida, um Master .dss standalone com so os elementos cujas
     barras estao em barras_subarvore, alimentado por uma fonte de tensao
@@ -273,6 +302,14 @@ def extrair_subalimentador(dss: py_dss_interface.DSS, barra_raiz: str, barras_su
             tcc2026.reatancia.estudo_trifasico). Sem isso, o R0/X0 usado na
             simulacao seria o valor generico padrao do OpenDSS (nao um
             calculo fisico real), inconsistente com a compensacao.
+        usar_geometria_cemig_monofasica: mesma ideia, para as linhas
+            monofasicas (phases=1), trocando o Linecode pelo laco
+            fase-neutro de referencia Cemig (ver
+            tcc2026.nucleo.geometria_eletrica.calcular_parametros_sequencia_monofasico_cemig).
+            Necessario para que o calculo de Z1L/Z0L por caminho (ver
+            tcc2026.nucleo.geometria_eletrica.acumular_parametros_linha_caminho)
+            seja fisicamente consistente com a propria simulacao, em
+            caminhos rele-folha que atravessam trechos monofasicos.
     Saida:
         Path do arquivo Master gerado (pronto para ser compilado).
     """
@@ -298,6 +335,11 @@ def extrair_subalimentador(dss: py_dss_interface.DSS, barra_raiz: str, barras_su
         chaves_mt = converter_linhas_trifasicas_para_geometria_cemig(chaves_mt)
         (pasta_saida / "geometria_cemig.dss").write_text(
             "\n".join(ge.texto_definicao_geometria_losangular_cemig()) + "\n", encoding="utf-8")
+    if usar_geometria_cemig_monofasica:
+        linhas_mt = converter_linhas_monofasicas_para_geometria_cemig(linhas_mt)
+        chaves_mt = converter_linhas_monofasicas_para_geometria_cemig(chaves_mt)
+        (pasta_saida / "geometria_cemig_1f.dss").write_text(
+            "\n".join(ge.texto_definicao_geometria_monofasica_cemig()) + "\n", encoding="utf-8")
 
     (pasta_saida / "linecodes_extraido.dss").write_text("\n".join(linecodes) + "\n", encoding="utf-8")
     (pasta_saida / "linhas_extraido.dss").write_text("\n".join(linhas_mt + chaves_mt) + "\n", encoding="utf-8")
@@ -317,6 +359,7 @@ def extrair_subalimentador(dss: py_dss_interface.DSS, barra_raiz: str, barras_su
         f'frequency=60 r1=0.0 x1=0.0001',
         'Redirect "linecodes_extraido.dss"',
         *(['Redirect "geometria_cemig.dss"'] if usar_geometria_cemig_trifasica else []),
+        *(['Redirect "geometria_cemig_1f.dss"'] if usar_geometria_cemig_monofasica else []),
         'Redirect "transformadores_extraido.dss"',
         'Redirect "linhas_extraido.dss"',
         'Redirect "curvacarga_extraido.dss"',

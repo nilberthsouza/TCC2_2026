@@ -148,6 +148,38 @@ def calcular_parametros_sequencia_losangular_cemig(nome_geometria: str = "GEOM_L
     }
 
 
+def texto_definicao_geometria_monofasica_cemig(nome_geometria: str = "GEOM_MONO_CEMIG",
+                                                nome_condutor: str = "COND_REF_CEMIG") -> list[str]:
+    """
+    Gera as linhas de texto DSS (WireData + LineGeometry) da geometria de
+    referencia para um ramal monofasico MT (fase + neutro reduzido, mesmo
+    condutor de catalogo da geometria losangular trifasica), prontas para
+    serem escritas em um arquivo .dss ou enviadas via dss.text(). Usada
+    tanto para calcular os parametros de sequencia de referencia (ver
+    calcular_parametros_sequencia_monofasico_cemig) quanto para aplicar a
+    geometria as linhas monofasicas reais de um trecho extraido (ver
+    tcc2026.extracao.extrator_trecho.converter_linhas_monofasicas_para_geometria_cemig).
+
+    Entradas:
+        nome_geometria: nome do objeto LineGeometry a criar.
+        nome_condutor: nome do objeto WireData a criar.
+    Saida:
+        lista de linhas de texto DSS (sem quebras de linha).
+    """
+    c = CONDUTOR_REFERENCIA
+    g = GEOMETRIA_LOSANGULAR_CEMIG
+    h = g["altura_base_m"]
+    return [
+        f'New wiredata.{nome_condutor} Rdc={c["rdc_ohm_km"]} Rac={c["rac_ohm_km"]} '
+        f'GMRac={c["gmr_m"]} GMRunits=m Radius={c["raio_m"]} Diam={c["diametro_m"]} '
+        f'radunits=m normamps={c["normamps"]} runits=km',
+        f'New linegeometry.{nome_geometria} nconds=2 nphases=1 reduce=yes',
+        f'~ cond=1 wire={nome_condutor} x=0.0 h={h}',          # fase
+        f'~ cond=2 wire={nome_condutor} x=0.0 h={h - 0.3}',    # neutro reduzido
+        '~ units=m',
+    ]
+
+
 @lru_cache(maxsize=1)
 def calcular_parametros_sequencia_monofasico_cemig(nome_geometria: str = "GEOM_MONO_CEMIG",
                                                      nome_condutor: str = "COND_REF_CEMIG") -> dict:
@@ -170,21 +202,11 @@ def calcular_parametros_sequencia_monofasico_cemig(nome_geometria: str = "GEOM_M
         com r0=r1 e x0=x1 pela natureza monofasica do trecho) e c1_nf_km,
         c0_nf_km (nF/km).
     """
-    c = CONDUTOR_REFERENCIA
-    g = GEOMETRIA_LOSANGULAR_CEMIG
     dss_aux = py_dss_interface.DSS()
     dss_aux.text("clear")
     dss_aux.text("new circuit.aux_geometria_1f basekv=13.8 bus1=aux1 pu=1.0")
-    dss_aux.text(
-        f'new wiredata.{nome_condutor} Rdc={c["rdc_ohm_km"]} Rac={c["rac_ohm_km"]} '
-        f'GMRac={c["gmr_m"]} GMRunits=m Radius={c["raio_m"]} Diam={c["diametro_m"]} '
-        f'radunits=m normamps={c["normamps"]} runits=km'
-    )
-    h = g["altura_base_m"]
-    dss_aux.text(f'new linegeometry.{nome_geometria} nconds=2 nphases=1 reduce=yes')
-    dss_aux.text(f'~ cond=1 wire={nome_condutor} x=0.0 h={h}')          # fase
-    dss_aux.text(f'~ cond=2 wire={nome_condutor} x=0.0 h={h - 0.3}')    # neutro reduzido
-    dss_aux.text('~ units=m')
+    for linha in texto_definicao_geometria_monofasica_cemig(nome_geometria, nome_condutor):
+        dss_aux.text(linha)
     dss_aux.text(
         f'new line.linha_referencia_1f bus1=aux1.1 bus2=aux2.1 '
         f'geometry={nome_geometria} length=1 units=km phases=1'

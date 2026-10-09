@@ -2,6 +2,7 @@ Clear
 New Circuit.JMLT310_GEOM_REAT basekv=13.800000 bus1="SEGM#194789369.1.2.3" phases=3 pu=0.998304 angle=-0.2268 frequency=60 r1=0.0 x1=0.0001
 Redirect "linecodes_extraido.dss"
 Redirect "geometria_cemig.dss"
+Redirect "geometria_cemig_1f.dss"
 Redirect "transformadores_extraido.dss"
 Redirect "linhas_extraido.dss"
 Redirect "curvacarga_extraido.dss"

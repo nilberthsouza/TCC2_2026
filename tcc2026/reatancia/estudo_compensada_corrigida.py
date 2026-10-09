@@ -48,7 +48,7 @@ def preparar_amostras_e_medidas(pasta_saida: Path, rf_ohm: float = RF_PADRAO_OHM
     origem0 = ga.obter_barra_origem(dss0)
     caminho_master = et.extrair_subalimentador(
         dss0, origem0, set(grafo_completo.nodes), pasta_saida / "alimentador_geometria_cemig",
-        "JMLT310_GEOM_REAT", usar_geometria_cemig_trifasica=True)
+        "JMLT310_GEOM_REAT", usar_geometria_cemig_trifasica=True, usar_geometria_cemig_monofasica=True)
 
     dss = et.compilar_subalimentador(caminho_master)
     dss_core.definir_modo_instantaneo(dss)
