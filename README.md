@@ -84,6 +84,12 @@ venv\Scripts\python.exe main.py --secoes visao_geral
 venv\Scripts\python.exe main.py --secoes todas
 ```
 
+Seções disponíveis: `visao_geral`, `tabela_tres_barras`, `trecho_monofasico`,
+`trecho_trifasico`, `resistencia_falta`, `takagi`,
+`reatancia_compensada_corrigida` (ou `todas`, que roda todas em ordem — o
+pipeline completo leva poucos minutos, a maior parte do tempo é a varredura
+de ~300 faltas nas Seções 6a/6b).
+
 Os resultados de cada seção são gravados em `resultados/<NN>_<secao>/`:
 CSVs com os dados brutos, gráficos `.png` (seaborn, sem títulos grandes) com
 descrição em `descricoes.json`, e tabelas `.tex`/`.txt` no padrão booktabs
