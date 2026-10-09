@@ -1,0 +1,10 @@
+New "Line.SMT_247808892" phases=1 bus1="NODE#445011077.2" bus2="NODE#445012146.2" linecode="1193_1" length=0.04522 units=km
+New "Line.RED_RED_SMT_343237416" phases=1 bus1="NODE#445011077.2" bus2="NODE#433471903.2" linecode="1193_1" length=0.07973 units=km
+New "Line.RED_RED_SMT_247808893" phases=1 bus1="NODE#445012146.2" bus2="NODE#445011547.2" linecode="1193_1" length=0.17045 units=km
+New "Line.RED_RED_SMT_247808685" phases=1 bus1="NODE#445012146.2" bus2="NODE#445011107.2" linecode="1193_1" length=0.09948 units=km
+New "Line.RED_SMT_343403092" phases=1 bus1="NODE#433472319.2" bus2="NODE#433472318.2" linecode="1192_1" length=0.04061 units=km
+New "Line.RED_SMT_247808670" phases=1 bus1="NODE#433472319.2" bus2="NODE#445011032.2" linecode="1220_1" length=0.15564 units=km
+New "Line.RED_SMT_245489012" phases=1 bus1="NODE#433471903.2" bus2="NODE#433472273.2" linecode="1192_1" length=0.10405 units=km
+New "Line.RED_SMT_247808669" phases=1 bus1="NODE#433471903.2" bus2="NODE#433472318.2" linecode="1193_1" length=0.10685 units=km
+New "Line.RED_SMT_351886223" phases=1 bus1="NODE#1987035704.2" bus2="NODE#433472318.2" linecode="1193_1" length=0.07721 units=km
+New "Line.RED_RED_SMT_245489081" phases=1 bus1="NODE#433472273.2" bus2="NODE#433472249.2" linecode="1192_1" length=0.13877 units=km

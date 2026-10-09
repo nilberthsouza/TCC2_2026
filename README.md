@@ -25,15 +25,19 @@ TCC2_2026/
 │   │   ├── geometria_eletrica.py # verificacao/adaptacao de LineGeometry (espacador losangular Cemig)
 │   │   ├── metricas.py         # MAE, RMSE, R2, erro max/medio, desvio padrao
 │   │   ├── graficos.py         # estilo seaborn padrao do projeto + salvamento com descricao
-│   │   └── latex_utils.py      # tabelas LaTeX (estilo booktabs) + .txt individuais
+│   │   ├── latex_utils.py      # tabelas LaTeX (estilo booktabs) + .txt individuais
+│   │   └── falta_injecao.py    # objeto Fault do OpenDSS + leitura de V/I no rele
 │   ├── topologia/
 │   │   └── visao_geral.py      # Secao 1: fluxo de potencia, curva horaria, topologia MT
 │   ├── faltas/                 # Secao 2: tabela de 3 barras (Thevenin/curto-circuito)
 │   │   ├── selecao_barras.py   # escolha das barras representativas (com/sem carga)
 │   │   ├── curto_circuito.py   # Thevenin, curto 1f/3f (modo FaultStudy), V/I de operacao
 │   │   └── tabela_barras.py    # orquestra a secao e gera as 3 tabelas (CSV + LaTeX)
-│   ├── extracao/                # Secao 3/4: extracao de sub-alimentador monofasico/trifasico
-│   ├── reatancia/                # metodo da reatancia aparente (com/sem carga, compensacao K0)
+│   ├── extracao/
+│   │   └── extrator_trecho.py  # extrai um ramal como mini-alimentador .dss standalone
+│   ├── reatancia/                # Secao 3/4: metodo da reatancia aparente
+│   │   ├── metodo_reatancia.py   # formulas (simples; compensacao K0 na Secao 4)
+│   │   └── estudo_monofasico.py  # orquestra a Secao 3 (trecho monofasico)
 │   ├── takagi/                   # metodo de Takagi (corrente e tensao, compensado)
 │   └── resistencia_falta/        # efeito da resistencia de falta (Rf) na distancia estimada
 └── resultados/                  # saida de cada secao: CSVs, graficos .png e tabelas .tex/.txt
@@ -115,6 +119,9 @@ logo em seguida.
 - [x] Seção 2 — Tabela de 3 barras (Thevenin, curto monofásico/trifásico,
       parâmetros de linha e carga concentrada para os 3 circuitos
       equivalentes — ver `resultados/02_tabela_falta_tres_barras/LEIA-ME.md`).
+- [x] Seção 3 — Trecho monofásico: extração automática do ramal mais
+      diverso, fluxo de potência, curva horária e método da reatância
+      simples (sem/com cargas) — ver `resultados/03_trecho_monofasico/LEIA-ME.md`.
 - [ ] Seção 3 — Trecho monofásico: extração, fluxo, reatância aparente.
 - [ ] Seção 4 — Trecho trifásico: extração, reatância com/sem compensação.
 - [ ] Seção 5 — Efeito da resistência de falta.

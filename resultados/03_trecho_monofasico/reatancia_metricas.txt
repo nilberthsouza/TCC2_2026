@@ -1,0 +1,15 @@
+% Contexto: Secao 3 - metricas de erro do metodo da reatancia aparente (sem compensacao) no trecho monofasico.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Erros do método da reatância simples no trecho monofásico (sem/com cargas)}
+  \label{tab:reatancia_1f_metricas}
+  \begin{tabular}{lcccccccc}
+    \toprule
+    \textbf{Cenário} & \textbf{MAE (km)} & \textbf{RMSE (km)} & \textbf{R²} & \textbf{Erro Máx. (km)} & \textbf{Erro Máx. (\%)} & \textbf{Erro Médio (km)} & \textbf{Erro Médio (\%)} & \textbf{Desvio Padrão (km)} \\
+    \midrule
+    Sem cargas & 0{,}0484 & 0{,}0557 & 0{,}8007 & 0{,}1101 & 22{,}9629 & 0{,}0264 & 5{,}5070 & 0{,}0490 \\
+    Com cargas & 0{,}0484 & 0{,}0557 & 0{,}8007 & 0{,}1101 & 22{,}9627 & 0{,}0264 & 5{,}5069 & 0{,}0490 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

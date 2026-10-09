@@ -194,6 +194,90 @@ def comprimento_total_linhas_km(grafo: nx.Graph) -> float:
     )
 
 
+def subarvore_a_partir_de(grafo: nx.Graph, barra_origem: str, barra_raiz: str) -> set:
+    """
+    Obtem o conjunto de barras do ramal que pende de "barra_raiz" (ela
+    propria e tudo que esta eletricamente a jusante dela), removendo a
+    aresta que liga barra_raiz ao resto da rede em direcao a origem. Como a
+    rede MT reduzida e radial, isso equivale a "cortar" o alimentador logo
+    antes de barra_raiz.
+
+    Entradas:
+        grafo: grafo eletrico restrito ao componente conexo da origem.
+        barra_origem: nome da barra de origem do alimentador completo.
+        barra_raiz: barra onde a sub-arvore comeca (ela fica incluida).
+    Saida:
+        conjunto com os nomes de todas as barras da sub-arvore (incluindo
+        barra_raiz); se barra_raiz == barra_origem, retorna todas as barras
+        do grafo.
+    """
+    if barra_raiz == barra_origem:
+        return set(grafo.nodes)
+    caminho = nx.shortest_path(grafo, barra_origem, barra_raiz, weight="comprimento_km")
+    barra_pai = caminho[-2]
+    grafo_cortado = grafo.copy()
+    grafo_cortado.remove_edge(barra_pai, barra_raiz)
+    return nx.node_connected_component(grafo_cortado, barra_raiz)
+
+
+def barras_trecho_monofasico(grafo: nx.Graph, barra_raiz: str) -> set:
+    """
+    Obtem as barras de um trecho estritamente monofasico a partir de uma
+    barra raiz: percorre so arestas do tipo "linha" com 1 fase (nunca
+    atravessa uma transicao para 3 fases) e inclui tambem a barra
+    secundaria (BT) de qualquer transformador ligado a uma dessas barras
+    (carga do trecho), sem continuar a navegacao a partir dela.
+
+    Entradas:
+        grafo: grafo eletrico restrito ao componente conexo da origem.
+        barra_raiz: barra MT monofasica onde o trecho comeca.
+    Saida:
+        conjunto de nomes de barra do trecho monofasico (MT + secundarios
+        BT dos transformadores desse trecho).
+    """
+    visitados = {barra_raiz}
+    pilha = [barra_raiz]
+    while pilha:
+        atual = pilha.pop()
+        for vizinho in grafo.neighbors(atual):
+            if vizinho in visitados:
+                continue
+            dados = grafo.edges[atual, vizinho]
+            if dados["tipo"] == "linha" and dados["fases"] == 1:
+                visitados.add(vizinho)
+                pilha.append(vizinho)
+            elif dados["tipo"] == "transformador":
+                visitados.add(vizinho)
+    return visitados
+
+
+def selecionar_trecho_monofasico_mais_diverso(grafo: nx.Graph, barra_origem: str) -> str:
+    """
+    Procura, entre todos os trechos estritamente monofasicos do
+    alimentador, o que tem mais barras (maior diversidade topologica:
+    ramificacoes e transformadores) e devolve sua barra raiz (o ponto onde
+    esse trecho se deriva da rede trifasica).
+
+    Entradas:
+        grafo: grafo eletrico restrito ao componente conexo da origem.
+        barra_origem: nome da barra de origem do alimentador.
+    Saida:
+        nome da barra raiz do trecho monofasico mais diverso.
+    """
+    distancias = distancias_desde_origem(grafo, barra_origem)
+    g1f = nx.Graph()
+    g1f.add_edges_from(
+        (a, b) for a, b, d in grafo.edges(data=True) if d["tipo"] == "linha" and d["fases"] == 1
+    )
+    melhor_raiz, melhor_tamanho = None, -1
+    for componente in nx.connected_components(g1f):
+        raiz = min(componente, key=lambda n: distancias[n])
+        tamanho = len(barras_trecho_monofasico(grafo, raiz))
+        if tamanho > melhor_tamanho:
+            melhor_raiz, melhor_tamanho = raiz, tamanho
+    return melhor_raiz
+
+
 def caminho_entre_barras(grafo: nx.Graph, barra_a: str, barra_b: str) -> list:
     """
     Obtem a sequencia de barras do caminho mais curto entre duas barras.
