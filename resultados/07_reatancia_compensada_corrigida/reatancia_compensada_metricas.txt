@@ -1,0 +1,17 @@
+% Contexto: Secao 6b - metricas do metodo da reatancia com compensacao K0 e correcao do offset, populacao completa de cada grupo.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Erros do método da reatância compensada e corrigida, por grupo de barras (JMLT310 reduzido)}
+  \label{tab:reatancia_compensada_metricas}
+  \begin{tabular}{lccccccc}
+    \toprule
+    \textbf{Grupo} & \textbf{N} & \textbf{MAE (km)} & \textbf{RMSE (km)} & \textbf{R²} & \textbf{Erro Máx. (km)} & \textbf{Erro Médio (km)} & \textbf{Desvio Padrão (km)} \\
+    \midrule
+    Ramificação & 161 & 2{,}2254 & 2{,}3910 & -0{,}4190 & 3{,}6645 & 2{,}2254 & 0{,}8744 \\
+    Folha & 34 & 1{,}8759 & 2{,}1692 & 0{,}2440 & 3{,}5327 & 1{,}8759 & 1{,}0893 \\
+    Aleatória & 100 & 2{,}2579 & 2{,}4164 & -0{,}5075 & 3{,}6671 & 2{,}2579 & 0{,}8608 \\
+    Global (todas as barras) & 300 & 2{,}2569 & 2{,}4252 & -0{,}4205 & 3{,}6671 & 2{,}2569 & 0{,}8877 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

@@ -1,0 +1,6 @@
+{
+  "reatancia_compensada_ramificacao.png": "Distância real x estimada (reatância compensada e corrigida) em 20 barras de ramificação.",
+  "reatancia_compensada_folha.png": "Distância real x estimada (reatância compensada e corrigida) em 20 barras folha.",
+  "reatancia_compensada_aleatoria.png": "Distância real x estimada (reatância compensada e corrigida) em 20 barras aleatórias (semente fixa).",
+  "reatancia_compensada_boxplot.png": "Distribuição do erro (estimado − real) do método da reatância compensada e corrigida, pelos 4 grupos de barras."
+}

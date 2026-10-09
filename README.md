@@ -37,10 +37,11 @@ TCC2_2026/
 │   │   └── tabela_barras.py    # orquestra a secao e gera as 3 tabelas (CSV + LaTeX)
 │   ├── extracao/
 │   │   └── extrator_trecho.py  # extrai um ramal como mini-alimentador .dss standalone
-│   ├── reatancia/                # Secao 3/4: metodo da reatancia aparente
+│   ├── reatancia/                # Secao 3/4/6b: metodo da reatancia aparente
 │   │   ├── metodo_reatancia.py   # formulas: simples, compensacao K0, correcao de offset
 │   │   ├── estudo_monofasico.py  # orquestra a Secao 3 (trecho monofasico)
-│   │   └── estudo_trifasico.py   # orquestra a Secao 4 (trecho trifasico, 5 variantes)
+│   │   ├── estudo_trifasico.py   # orquestra a Secao 4 (trecho trifasico, 5 variantes)
+│   │   └── estudo_compensada_corrigida.py  # orquestra a Secao 6b (alimentador inteiro)
 │   ├── takagi/                   # Secao 6a: metodo de Takagi (corrente e tensao, compensado)
 │   │   ├── metodo_takagi.py      # formula (com e sem compensacao K0)
 │   │   └── estudo_takagi.py      # orquestra a Secao 6a (300 barras MT, 4 grupos)
@@ -138,4 +139,7 @@ logo em seguida.
 - [x] Seção 6a — Método de Takagi compensado (tensão no relé + compensação
       K0) nas 300 barras MT do alimentador, agrupadas em
       ramificação/folha/aleatória/global — ver `resultados/06_takagi/LEIA-ME.md`.
-- [ ] Seção 6b — Método da reatância compensada e corrigida, mesma amostragem.
+- [x] Seção 6b — Método da reatância compensada e corrigida, mesma
+      amostragem do alimentador inteiro — ver
+      `resultados/07_reatancia_compensada_corrigida/LEIA-ME.md` (inclui
+      uma limitação de calibração importante, documentada ali).
