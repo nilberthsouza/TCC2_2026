@@ -7,3 +7,8 @@ __pycache__/
 .vscode/
 .idea/
 *.dss.bak
+
+# Material do texto do TCC (LaTeX, PDFs, zips) nao pertence ao repositorio de codigo
+*.zip
+"TCC2 NILBERTH.zip"
+Texto_TCC2/
