@@ -84,6 +84,24 @@ def definir_modo_instantaneo(dss: py_dss_interface.DSS) -> None:
     dss.text("set hour=0")
 
 
+def escalar_carregamento(dss: py_dss_interface.DSS, fator: float) -> None:
+    """
+    Escala uniformemente todas as cargas do circuito ativo por `fator`,
+    via o multiplicador global de carga do OpenDSS (Set LoadMult=), sem
+    alterar os valores nominais de kW/kvar de cada objeto Load. Usado para
+    simular cenarios de carregamento 2x/4x/6x (ver
+    tcc2026.reatancia.estudo_trifasico/estudo_monofasico).
+
+    Entradas:
+        dss: instancia do motor OpenDSS (ja compilada).
+        fator: multiplicador de carga (1.0 = carregamento nominal).
+    Saida:
+        nenhuma (altera o estado interno do solver; chamar
+        resolver_fluxo_potencia novamente apos esta funcao).
+    """
+    dss.text(f"Set LoadMult={fator}")
+
+
 def calcular_impedancia_equivalente_subestacao(dados_subestacao: dict = SUBESTACAO) -> dict:
     """
     Calcula a impedancia de Thevenin equivalente, no lado de 13,8 kV, do

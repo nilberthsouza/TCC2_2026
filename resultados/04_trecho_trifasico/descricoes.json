@@ -7,5 +7,6 @@
   "reatancia_boxplot.png": "Distribuição do erro (estimado − real) das 5 variantes do método da reatância, lado a lado.",
   "trecho_isolado.png": "Topologia esquemática (layout de grafo, não geográfico) do trecho trifásico extraído.",
   "trecho_destacado_no_alimentador.png": "Trecho trifásico (vermelho) destacado na topologia completa do alimentador (layout esquemático).",
-  "trecho_destacado_geografico.png": "Mapa geográfico do alimentador JMLT310, com o trecho trifásico extraído destacado em vermelho."
+  "trecho_destacado_geografico.png": "Mapa geográfico do alimentador JMLT310, com o trecho trifásico extraído destacado em vermelho.",
+  "carregamento_mae.png": "MAE do método de Takagi e da reatância compensada e corrigida, em função do fator de carregamento."
 }

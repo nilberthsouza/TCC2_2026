@@ -16,6 +16,7 @@ from tcc2026.nucleo import mapa_geografico as mg
 from tcc2026.reatancia import metodo_reatancia as mr
 
 RF_PADRAO_OHM = 0.01
+FATORES_CARREGAMENTO = [1, 2, 4, 6]
 
 
 def extrair_trecho(pasta_saida: Path) -> dict:
@@ -139,6 +140,118 @@ def executar_varredura_reatancia(caminho_master: Path, rf_ohm: float = RF_PADRAO
         "x1_ref_ohm_km": x1_ref,
         "distancia_tronco_km": max(distancias.values()),
     }
+
+
+def executar_varredura_carregamento(caminho_master: Path, rf_ohm: float = RF_PADRAO_OHM,
+                                     fatores: list = FATORES_CARREGAMENTO) -> pd.DataFrame:
+    """
+    Avalia o metodo da reatancia simples no trecho monofasico sob fatores
+    de carregamento 1x/2x/4x/6x (Set LoadMult=, ver
+    dss_core.escalar_carregamento), para entender a sensibilidade desse
+    metodo ao carregamento.
+
+    O metodo de Takagi NAO e avaliado aqui: o trecho monofasico extraido e
+    um circuito genuinamente monofasico (uma unica fase, sem referencia
+    trifasica), de modo que nao ha decomposicao em sequencia positiva/zero
+    possivel (I0 nao e definido com uma unica fase presente) -- o fator de
+    compensacao k0 e a propria formula de Takagi compensado (Secao~3.2)
+    exigem correntes trifasicas no rele. A comparacao Takagi x reatancia
+    sob carregamento e feita no trecho trifasico (ver
+    tcc2026.reatancia.estudo_trifasico.executar_varredura_carregamento),
+    onde ambos os metodos sao aplicaveis.
+
+    Entradas:
+        caminho_master: Path do Master do mini-alimentador extraido.
+        rf_ohm: resistencia de falta usada em todas as simulacoes (ohms).
+        fatores: lista de multiplicadores de carga a testar.
+    Saida:
+        DataFrame: fator_carregamento, barra, distancia_real_km, distancia_estimada_km.
+    """
+    dss = et.compilar_subalimentador(caminho_master)
+    dss_core.definir_modo_instantaneo(dss)
+    dss_core.resolver_fluxo_potencia(dss)
+
+    grafo = ga.componente_conexa_da_origem(ga.construir_grafo_eletrico(dss), ga.obter_barra_origem(dss))
+    origem = ga.obter_barra_origem(dss)
+    distancias = ga.distancias_desde_origem(grafo, origem)
+    barras_mt = sorted(ga.barras_de_media_tensao(grafo) - {origem})
+    x1_ref = mr.x1_medio_ponderado_trecho(dss, grafo)
+
+    dss.circuit.set_active_bus(origem)
+    fase = int(dss.bus.nodes[0])
+    fi.preparar_elemento_falta(dss)
+
+    linhas = []
+    for fator in fatores:
+        dss_core.escalar_carregamento(dss, fator)
+        if not dss_core.resolver_fluxo_potencia(dss):
+            raise RuntimeError(f"Fluxo de potencia nao convergiu para fator de carregamento {fator}.")
+        for barra in barras_mt:
+            fi.aplicar_falta_monofasica(dss, barra, fase, rf_ohm)
+            dss.text("solve")
+            if dss.solution.converged:
+                tensao, corrente = fi.medir_tensao_corrente_rele(dss, origem, fase)
+                distancia_estimada = mr.distancia_reatancia_simples(tensao, corrente, x1_ref)
+                linhas.append({
+                    "fator_carregamento": fator, "barra": barra,
+                    "distancia_real_km": distancias[barra],
+                    "distancia_estimada_km": distancia_estimada,
+                })
+            fi.remover_falta(dss)
+    dss_core.escalar_carregamento(dss, 1.0)
+    return pd.DataFrame(linhas)
+
+
+def gerar_metricas_e_graficos_carregamento(tabela_carregamento: pd.DataFrame, pasta_saida: Path) -> pd.DataFrame:
+    """
+    Calcula as metricas de erro por fator de carregamento (reatancia
+    simples, trecho monofasico) e gera um grafico de MAE x fator.
+
+    Entradas:
+        tabela_carregamento: DataFrame devolvido por executar_varredura_carregamento.
+        pasta_saida: pasta de resultados desta secao.
+    Saida:
+        DataFrame com as metricas por fator_carregamento.
+    """
+    tabela = tabela_carregamento.copy()
+    tabela["erro_km"] = tabela["distancia_estimada_km"] - tabela["distancia_real_km"]
+    tabela.to_csv(pasta_saida / "carregamento_resultados.csv", index=False)
+    comprimento_base = tabela["distancia_real_km"].max()
+
+    linhas_metricas = []
+    for fator, sub in tabela.groupby("fator_carregamento"):
+        m = metricas.resumo_metricas(sub["distancia_real_km"].to_numpy(), sub["distancia_estimada_km"].to_numpy(),
+                                      comprimento_base)
+        m["fator_carregamento"] = fator
+        linhas_metricas.append(m)
+    tabela_metricas = pd.DataFrame(linhas_metricas).sort_values("fator_carregamento")[
+        ["fator_carregamento", "mae_km", "rmse_km", "r2", "erro_max_km", "erro_medio_km"]]
+    tabela_metricas.to_csv(pasta_saida / "carregamento_metricas.csv", index=False)
+    latex_utils.salvar_tabela_latex(
+        tabela_metricas.rename(columns={
+            "fator_carregamento": "Fator", "mae_km": "MAE (km)", "rmse_km": "RMSE (km)",
+            "r2": "R²", "erro_max_km": "Erro Máx. (km)", "erro_medio_km": "Erro Médio (km)",
+        }),
+        pasta_saida / "carregamento_metricas.txt",
+        legenda="Erros do método da reatância simples, por fator de carregamento (trecho monofásico)",
+        rotulo="carregamento_1f_metricas",
+        contexto="Secao 3b - metricas de erro por fator de carregamento (1x/2x/4x/6x), reatancia simples.",
+        decimais={"Fator": 0, "MAE (km)": 4, "RMSE (km)": 4, "R²": 4, "Erro Máx. (km)": 4, "Erro Médio (km)": 4},
+        alinhamento="cccccc",
+    )
+
+    graficos.aplicar_estilo_padrao()
+    fig, eixo = plt.subplots(figsize=(6, 4.5))
+    sns.lineplot(data=tabela_metricas, x="fator_carregamento", y="mae_km", marker="o", ax=eixo, color="#2b6cb0")
+    eixo.set_xlabel("Fator de carregamento (x carga nominal)")
+    eixo.set_ylabel("MAE (km)")
+    eixo.set_xticks(sorted(tabela_metricas["fator_carregamento"].unique()))
+    sns.despine(ax=eixo)
+    graficos.salvar_figura(
+        fig, pasta_saida / "carregamento_mae.png",
+        "MAE do método da reatância simples, em função do fator de carregamento (trecho monofásico)."
+    )
+    return tabela_metricas
 
 
 def gerar_metricas_e_graficos(resultado_varredura: dict, pasta_saida: Path) -> pd.DataFrame:
@@ -276,7 +389,12 @@ def executar_estudo_monofasico(pasta_saida: Path) -> dict:
     tabela_metricas = gerar_metricas_e_graficos(varredura, pasta_saida)
     plotar_mapas_trecho(extracao["grafo_completo"], extracao["barras_sub"], pasta_saida)
 
+    tabela_carregamento = executar_varredura_carregamento(extracao["caminho_master"])
+    tabela_metricas_carregamento = gerar_metricas_e_graficos_carregamento(tabela_carregamento, pasta_saida)
+
     return {
         "extracao": extracao, "fluxo_curvas": fluxo_curvas,
         "varredura": varredura, "tabela_metricas": tabela_metricas,
+        "tabela_carregamento": tabela_carregamento,
+        "tabela_metricas_carregamento": tabela_metricas_carregamento,
     }

@@ -1,0 +1,21 @@
+% Contexto: Secao 4b - metricas de erro por fator de carregamento (1x/2x/4x/6x), Takagi vs reatancia corrigida.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Erros do método de Takagi e da reatância compensada e corrigida, por fator de carregamento (trecho trifásico)}
+  \label{tab:carregamento_3f_metricas}
+  \begin{tabular}{ccccccc}
+    \toprule
+    \textbf{Fator} & \textbf{Método} & \textbf{MAE (km)} & \textbf{RMSE (km)} & \textbf{R²} & \textbf{Erro Máx. (km)} & \textbf{Erro Médio (km)} \\
+    \midrule
+    1 & Reatância compensada e corrigida & 0{,}0210 & 0{,}0409 & 0{,}9808 & 0{,}1129 & -0{,}0210 \\
+    2 & Reatância compensada e corrigida & 0{,}0210 & 0{,}0410 & 0{,}9808 & 0{,}1130 & -0{,}0210 \\
+    4 & Reatância compensada e corrigida & 0{,}0210 & 0{,}0410 & 0{,}9808 & 0{,}1130 & -0{,}0210 \\
+    6 & Reatância compensada e corrigida & 0{,}0211 & 0{,}0410 & 0{,}9807 & 0{,}1130 & -0{,}0211 \\
+    1 & Takagi compensado & 0{,}0591 & 0{,}0972 & 0{,}8919 & 0{,}2391 & -0{,}0591 \\
+    2 & Takagi compensado & 0{,}0591 & 0{,}0972 & 0{,}8919 & 0{,}2392 & -0{,}0591 \\
+    4 & Takagi compensado & 0{,}0591 & 0{,}0972 & 0{,}8919 & 0{,}2392 & -0{,}0591 \\
+    6 & Takagi compensado & 0{,}0592 & 0{,}0972 & 0{,}8918 & 0{,}2391 & -0{,}0592 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

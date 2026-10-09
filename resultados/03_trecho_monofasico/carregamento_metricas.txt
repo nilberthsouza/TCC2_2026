@@ -1,0 +1,17 @@
+% Contexto: Secao 3b - metricas de erro por fator de carregamento (1x/2x/4x/6x), reatancia simples.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Erros do método da reatância simples, por fator de carregamento (trecho monofásico)}
+  \label{tab:carregamento_1f_metricas}
+  \begin{tabular}{cccccc}
+    \toprule
+    \textbf{Fator} & \textbf{MAE (km)} & \textbf{RMSE (km)} & \textbf{R²} & \textbf{Erro Máx. (km)} & \textbf{Erro Médio (km)} \\
+    \midrule
+    1 & 0{,}0484 & 0{,}0557 & 0{,}8007 & 0{,}1101 & 0{,}0264 \\
+    2 & 0{,}0484 & 0{,}0557 & 0{,}8007 & 0{,}1101 & 0{,}0264 \\
+    4 & 0{,}0484 & 0{,}0557 & 0{,}8007 & 0{,}1101 & 0{,}0264 \\
+    6 & 0{,}0484 & 0{,}0557 & 0{,}8007 & 0{,}1101 & 0{,}0264 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

@@ -13,11 +13,14 @@ import seaborn as sns
 
 from tcc2026.extracao import extrator_trecho as et
 from tcc2026.nucleo import (dss_core, falta_injecao as fi, geometria_eletrica as ge,
-                             graficos, grafo_alimentador as ga, latex_utils, metricas)
+                             graficos, grafo_alimentador as ga, latex_utils, metricas,
+                             varredura_falta_rele as vf)
 from tcc2026.nucleo import mapa_geografico as mg
 from tcc2026.reatancia import metodo_reatancia as mr
+from tcc2026.takagi import metodo_takagi as mt
 
 RF_PADRAO_OHM = 0.01
+FATORES_CARREGAMENTO = [1, 2, 4, 6]
 
 RUBRICA_METODOS = {
     "original_sem_carga": "Sem compensação, sem cargas",
@@ -242,6 +245,116 @@ def gerar_metricas_e_graficos(resultado_varredura: dict, pasta_saida: Path) -> p
     return tabela_metricas
 
 
+def executar_varredura_carregamento(caminho_master: Path, rf_ohm: float = RF_PADRAO_OHM,
+                                     fatores: list = FATORES_CARREGAMENTO) -> pd.DataFrame:
+    """
+    Compara o metodo da reatancia compensada e corrigida com o metodo de
+    Takagi compensado no trecho trifasico, sob fatores de carregamento
+    1x/2x/4x/6x (Set LoadMult=, ver dss_core.escalar_carregamento), para
+    entender qual dos dois metodos e mais sensivel ao carregamento do
+    trecho (que altera a corrente de carga pre-falta e, portanto, a
+    corrente compensada e a variacao de corrente usada pelo Takagi).
+
+    Entradas:
+        caminho_master: Path do Master do mini-alimentador extraido.
+        rf_ohm: resistencia de falta usada em todas as simulacoes (ohms).
+        fatores: lista de multiplicadores de carga a testar.
+    Saida:
+        DataFrame longo: fator_carregamento, metodo, barra,
+        distancia_real_km, distancia_estimada_km.
+    """
+    dados_geo = ge.calcular_parametros_sequencia_losangular_cemig()
+    z1_geo = complex(dados_geo["r1_ohm_km"], dados_geo["x1_ohm_km"])
+    z0_geo = complex(dados_geo["r0_ohm_km"], dados_geo["x0_ohm_km"])
+    k0 = mr.fator_compensacao_k0(z1_geo, z0_geo)
+
+    dss = et.compilar_subalimentador(caminho_master)
+    dss_core.definir_modo_instantaneo(dss)
+    dss_core.resolver_fluxo_potencia(dss)
+
+    grafo = ga.componente_conexa_da_origem(ga.construir_grafo_eletrico(dss), ga.obter_barra_origem(dss))
+    origem = ga.obter_barra_origem(dss)
+    barras_mt = sorted(ga.barras_de_media_tensao(grafo) - {origem})
+
+    linhas = []
+    for fator in fatores:
+        dss_core.escalar_carregamento(dss, fator)
+        if not dss_core.resolver_fluxo_potencia(dss):
+            raise RuntimeError(f"Fluxo de potencia nao convergiu para fator de carregamento {fator}.")
+        medidas = vf.executar_varredura(dss, grafo, origem, barras_mt, rf_ohm)
+        for _, linha in medidas.iterrows():
+            ia_comp_pos = mr.corrente_compensada(linha["ia_pos"], linha["i0_pos"], k0)
+            d_reatancia = mr.distancia_reatancia_corrigida_exata(linha["va_pos"], ia_comp_pos, z1_geo, z0_geo)
+            linhas.append({"fator_carregamento": fator, "metodo": "Reatância compensada e corrigida",
+                            "barra": linha["barra"], "distancia_real_km": linha["distancia_real_km"],
+                            "distancia_estimada_km": d_reatancia})
+
+            d_takagi = mt.distancia_takagi_compensado(
+                linha["va_pos"], linha["ia_pos"], linha["ia_pre"],
+                linha["i0_pos"], linha["i0_pre"], k0, z1_geo)
+            linhas.append({"fator_carregamento": fator, "metodo": "Takagi compensado",
+                            "barra": linha["barra"], "distancia_real_km": linha["distancia_real_km"],
+                            "distancia_estimada_km": d_takagi})
+    dss_core.escalar_carregamento(dss, 1.0)
+    return pd.DataFrame(linhas)
+
+
+def gerar_metricas_e_graficos_carregamento(tabela_carregamento: pd.DataFrame, pasta_saida: Path) -> pd.DataFrame:
+    """
+    Calcula as metricas de erro por fator de carregamento e metodo, e gera
+    um grafico de MAE x fator de carregamento (uma linha por metodo).
+
+    Entradas:
+        tabela_carregamento: DataFrame devolvido por executar_varredura_carregamento.
+        pasta_saida: pasta de resultados desta secao.
+    Saida:
+        DataFrame com as metricas por (fator_carregamento, metodo).
+    """
+    tabela = tabela_carregamento.copy()
+    tabela["erro_km"] = tabela["distancia_estimada_km"] - tabela["distancia_real_km"]
+    tabela.to_csv(pasta_saida / "carregamento_resultados.csv", index=False)
+    comprimento_base = tabela["distancia_real_km"].max()
+
+    linhas_metricas = []
+    for (fator, metodo), sub in tabela.groupby(["fator_carregamento", "metodo"]):
+        m = metricas.resumo_metricas(sub["distancia_real_km"].to_numpy(), sub["distancia_estimada_km"].to_numpy(),
+                                      comprimento_base)
+        m["fator_carregamento"] = fator
+        m["metodo"] = metodo
+        linhas_metricas.append(m)
+    tabela_metricas = pd.DataFrame(linhas_metricas).sort_values(["metodo", "fator_carregamento"])[
+        ["fator_carregamento", "metodo", "mae_km", "rmse_km", "r2", "erro_max_km", "erro_medio_km"]]
+    tabela_metricas.to_csv(pasta_saida / "carregamento_metricas.csv", index=False)
+    latex_utils.salvar_tabela_latex(
+        tabela_metricas.rename(columns={
+            "fator_carregamento": "Fator", "metodo": "Método", "mae_km": "MAE (km)", "rmse_km": "RMSE (km)",
+            "r2": "R²", "erro_max_km": "Erro Máx. (km)", "erro_medio_km": "Erro Médio (km)",
+        }),
+        pasta_saida / "carregamento_metricas.txt",
+        legenda="Erros do método de Takagi e da reatância compensada e corrigida, "
+                "por fator de carregamento (trecho trifásico)",
+        rotulo="carregamento_3f_metricas",
+        contexto="Secao 4b - metricas de erro por fator de carregamento (1x/2x/4x/6x), Takagi vs reatancia corrigida.",
+        decimais={"Fator": 0, "MAE (km)": 4, "RMSE (km)": 4, "R²": 4, "Erro Máx. (km)": 4, "Erro Médio (km)": 4},
+        alinhamento="ccccccc",
+    )
+
+    graficos.aplicar_estilo_padrao()
+    fig, eixo = plt.subplots(figsize=(6.5, 4.5))
+    sns.lineplot(data=tabela_metricas, x="fator_carregamento", y="mae_km", hue="metodo",
+                 marker="o", ax=eixo)
+    eixo.set_xlabel("Fator de carregamento (x carga nominal)")
+    eixo.set_ylabel("MAE (km)")
+    eixo.set_xticks(sorted(tabela_metricas["fator_carregamento"].unique()))
+    eixo.legend(title="")
+    sns.despine(ax=eixo)
+    graficos.salvar_figura(
+        fig, pasta_saida / "carregamento_mae.png",
+        "MAE do método de Takagi e da reatância compensada e corrigida, em função do fator de carregamento."
+    )
+    return tabela_metricas
+
+
 def plotar_mapas_trecho(grafo_completo, barras_sub: set, pasta_saida: Path) -> None:
     """
     Gera um grafico esquematico so do trecho trifasico extraido e outro
@@ -307,7 +420,12 @@ def executar_estudo_trifasico(pasta_saida: Path) -> dict:
     tabela_metricas = gerar_metricas_e_graficos(varredura, pasta_saida)
     plotar_mapas_trecho(extracao["grafo_completo"], extracao["barras_sub"], pasta_saida)
 
+    tabela_carregamento = executar_varredura_carregamento(extracao["caminho_master"])
+    tabela_metricas_carregamento = gerar_metricas_e_graficos_carregamento(tabela_carregamento, pasta_saida)
+
     return {
         "extracao": extracao, "fluxo_curvas": fluxo_curvas,
         "varredura": varredura, "tabela_metricas": tabela_metricas,
+        "tabela_carregamento": tabela_carregamento,
+        "tabela_metricas_carregamento": tabela_metricas_carregamento,
     }
