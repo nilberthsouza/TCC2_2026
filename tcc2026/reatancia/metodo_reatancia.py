@@ -4,12 +4,11 @@ e corrente no rele durante a falta, estima a distancia usando so a parte
 imaginaria da impedancia aparente (menos sensivel a resistencia de falta
 que a parte real), calibrada pela reatancia de sequencia positiva (X1) por
 km do trecho avaliado. Inclui tambem a compensacao de sequencia zero (K0)
-e a correcao do offset que o fator de compensacao introduz quando a falta
-tem resistencia (ver tcc2026.nucleo.geometria_eletrica para Z1/Z0 de
-referencia).
+e a correcao exata do offset que o fator de compensacao introduz quando a
+falta tem resistencia, resolvendo Zm = s*Z1 + Rf*C como sistema de duas
+equacoes reais (ver tcc2026.nucleo.geometria_eletrica para Z1/Z0 de
+referencia e o Apendice C do texto do TCC para a deducao completa).
 """
-import cmath
-
 import py_dss_interface
 
 from tcc2026.nucleo import geometria_eletrica as ge
@@ -138,23 +137,6 @@ def fator_c(z1_ohm_km: complex, z0_ohm_km: complex) -> complex:
     return 3 * z1_ohm_km / (2 * z1_ohm_km + z0_ohm_km)
 
 
-def z0_corrigido_para_anular_offset(z1_ohm_km: complex, z0_ohm_km: complex) -> complex:
-    """
-    Ajusta o angulo de Z0 para ser igual ao de Z1 (mantendo o modulo de
-    Z0), o que anula Im(C) (ver fator_c) e, com isso, o offset que a
-    resistencia de falta introduziria na parte imaginaria de Zm — pois
-    Im(C) = 0 se e somente se anguloZ0 = anguloZ1 (X0/R0 = X1/R1).
-
-    Entradas:
-        z1_ohm_km, z0_ohm_km: impedancias de sequencia positiva e zero de
-            referencia (ohm/km, complexo).
-    Saida:
-        Z0 corrigido (ohm/km, complexo, mesmo modulo de z0_ohm_km, angulo
-        igual ao de z1_ohm_km).
-    """
-    return abs(z0_ohm_km) * cmath.exp(1j * cmath.phase(z1_ohm_km))
-
-
 def distancia_reatancia_compensada(tensao_rele_v: complex, corrente_compensada_a: complex,
                                     x1_ref_ohm_km: float) -> float:
     """
@@ -170,3 +152,52 @@ def distancia_reatancia_compensada(tensao_rele_v: complex, corrente_compensada_a
     """
     zm = tensao_rele_v / corrente_compensada_a
     return zm.imag / x1_ref_ohm_km
+
+
+def distancia_reatancia_corrigida_exata(tensao_rele_v: complex, corrente_compensada_a: complex,
+                                         z1_ohm_km: complex, z0_ohm_km: complex) -> float:
+    """
+    Estima a distancia da falta pelo metodo da reatancia compensada com
+    correcao EXATA do offset de resistencia de falta: em vez de supor Rf
+    desprezivel ou ajustar artificialmente o angulo de Z0 para anular
+    Im(C), resolve o sistema Zm = s*Z1 + Rf*C (uma equacao complexa, duas
+    equacoes reais) para as duas incognitas reais s e Rf, multiplicando
+    por conj(C) e tomando a parte imaginaria (ver deducao completa no
+    Apendice C do texto do TCC):
+
+        C = 3*Z1 / (2*Z1 + Z0)
+        s_hat = Im(Zm * conj(C)) / Im(Z1 * conj(C))
+
+    Entradas:
+        tensao_rele_v: tensao fase-neutro no rele durante a falta (V).
+        corrente_compensada_a: corrente de fase compensada (Ia + K0*I0, ver
+            corrente_compensada), com K0 = (Z0-Z1)/Z1 calculado diretamente
+            a partir de z1_ohm_km e z0_ohm_km (sem nenhum ajuste artificial
+            de angulo).
+        z1_ohm_km, z0_ohm_km: impedancias de sequencia positiva e zero de
+            referencia (ohm/km, complexo).
+    Saida:
+        distancia estimada ate a falta, em km.
+    """
+    zm = tensao_rele_v / corrente_compensada_a
+    c_conj = fator_c(z1_ohm_km, z0_ohm_km).conjugate()
+    return (zm * c_conj).imag / (z1_ohm_km * c_conj).imag
+
+
+def resistencia_falta_estimada_exata(tensao_rele_v: complex, corrente_compensada_a: complex,
+                                      z1_ohm_km: complex, z0_ohm_km: complex) -> float:
+    """
+    Estima a resistencia de falta Rf como subproduto da correcao exata do
+    offset (ver distancia_reatancia_corrigida_exata), multiplicando
+    Zm = s*Z1 + Rf*C por conj(Z1) e tomando a parte imaginaria:
+
+        Rf_hat = Im(Zm * conj(Z1)) / Im(C * conj(Z1))
+
+    Entradas: mesmas de distancia_reatancia_corrigida_exata.
+    Saida:
+        resistencia de falta estimada, em ohms.
+    """
+    zm = tensao_rele_v / corrente_compensada_a
+    c = fator_c(z1_ohm_km, z0_ohm_km)
+    z1_conj = z1_ohm_km.conjugate()
+    return (zm * z1_conj).imag / (c * z1_conj).imag

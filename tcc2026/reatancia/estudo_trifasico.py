@@ -23,7 +23,7 @@ RUBRICA_METODOS = {
     "original_com_carga": "Sem compensação, com cargas",
     "compensado_sem_carga": "Compensação K0, sem cargas",
     "compensado_com_carga": "Compensação K0, com cargas",
-    "compensado_corrigido_sem_carga": "Compensação K0 + correção do offset, sem cargas",
+    "compensado_corrigido_sem_carga": "Compensação K0 + correção exata do offset, sem cargas",
 }
 
 
@@ -115,8 +115,6 @@ def executar_varredura_reatancia_5_variantes(caminho_master: Path, rf_ohm: float
     z1_geo = complex(dados_geo["r1_ohm_km"], dados_geo["x1_ohm_km"])
     z0_geo = complex(dados_geo["r0_ohm_km"], dados_geo["x0_ohm_km"])
     k0 = mr.fator_compensacao_k0(z1_geo, z0_geo)
-    z0_corrigido = mr.z0_corrigido_para_anular_offset(z1_geo, z0_geo)
-    k0_corrigido = mr.fator_compensacao_k0(z1_geo, z0_corrigido)
 
     dss = et.compilar_subalimentador(caminho_master)
     dss_core.definir_modo_instantaneo(dss)
@@ -155,8 +153,7 @@ def executar_varredura_reatancia_5_variantes(caminho_master: Path, rf_ohm: float
                                 "distancia_real_km": distancias[barra], "distancia_estimada_km": d_compensado})
 
                 if cenario == "sem_carga":
-                    ia_comp_corr = mr.corrente_compensada(ia, i0, k0_corrigido)
-                    d_corrigido = mr.distancia_reatancia_compensada(va, ia_comp_corr, x1_ref)
+                    d_corrigido = mr.distancia_reatancia_corrigida_exata(va, ia_comp, z1_geo, z0_geo)
                     linhas.append({"barra": barra, "metodo": "compensado_corrigido_sem_carga",
                                     "distancia_real_km": distancias[barra], "distancia_estimada_km": d_corrigido})
             fi.remover_falta(dss)

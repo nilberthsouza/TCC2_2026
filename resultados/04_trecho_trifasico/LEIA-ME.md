@@ -31,26 +31,37 @@ por 5 variantes (`reatancia_resultados.csv`, formato longo):
    `d = Im(Va/Ia_comp) / X1`, com `K0 = (Z0-Z1)/Z1` calculado pela geometria
    de referência Cemig.
 4. **Compensação K0, com cargas** — idem, com cargas.
-5. **Compensação K0 + correção do offset, sem cargas** — usa um Z0
-   "corrigido" (mesmo módulo, ângulo igualado ao de Z1) para anular
-   `Im(C)` (`C = 3·Z1/(2·Z1+Z0)`), eliminando o offset que `Rf·Im(C)`
-   introduziria na parte imaginária de Zm quando `∠Z0 ≠ ∠Z1`.
+5. **Compensação K0 + correção EXATA do offset, sem cargas** — resolve
+   `Zm = s·Z1 + Rf·C` (com `C = 3·Z1/(2·Z1+Z0)`) como sistema de duas
+   equações reais e duas incógnitas (`s` e `Rf`), multiplicando por
+   `conj(C)` e tomando a parte imaginária:
+   `s_hat = Im(Zm·conj(C)) / Im(Z1·conj(C))`
+   (ver `tcc2026.reatancia.metodo_reatancia.distancia_reatancia_corrigida_exata`
+   e a dedução completa no Apêndice C do texto do TCC). Essa correção
+   **substituiu** uma versão anterior, aproximada, que ajustava
+   artificialmente o ângulo de Z0 para anular `Im(C)` — a correção exata é
+   dramaticamente melhor (ver resultado abaixo).
 
 Todas as variantes usam o mesmo X1 de referência (`reatancia_metricas.csv`
 traz o valor, média ponderada pelos Linecodes reais do trecho), para que a
-diferença entre elas venha só da corrente usada na fórmula, não de uma
+diferença entre elas venha só da corrente/fórmula usada, não de uma
 calibração diferente.
 
 ## Resultado (ver `reatancia_metricas.csv`/`.txt`)
 
-O método **sem compensação** erra sistematicamente e muito (≈74% de erro
-médio, R² negativo) — esperado: ele ignora completamente o caminho de
-retorno pela terra (sequência zero) de uma falta monofásica-terra. A
-**compensação K0** reduz o erro médio para ≈16%, e a **correção do offset**
-reduz ainda mais, para ≈13%, com o menor desvio padrão entre as 5
-variantes — exatamente o comportamento esperado pela teoria (ver
-`reatancia_real_vs_estimado.png`: os pontos "sem compensação" ficam bem
-acima da diagonal; os compensados, grudados nela).
+| Variante | MAE (km) | R² | Erro médio (%) |
+|---|---|---|---|
+| Sem compensação | 0,774 | -7,64 | 73,7 |
+| Compensação K0 | 0,164 | 0,598 | -15,6 |
+| Compensação K0 + correção **exata** | **0,021** | **0,981** | **-2,0** |
+
+O método **sem compensação** erra sistematicamente e muito (ignora o
+caminho de retorno pela terra). A **compensação K0** reduz bastante o erro,
+mas ainda carrega o offset proporcional a Rf. A **correção exata** do
+offset praticamente elimina o erro restante — uma melhora de quase uma
+ordem de grandeza em relação à compensação K0 sozinha, e muito superior à
+correção aproximada testada anteriormente (que só chegava a MAE ≈ 0,14 km,
+R² ≈ 0,71).
 
 ## Gráficos
 

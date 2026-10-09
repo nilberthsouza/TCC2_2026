@@ -38,7 +38,7 @@ TCC2_2026/
 │   ├── extracao/
 │   │   └── extrator_trecho.py  # extrai um ramal como mini-alimentador .dss standalone
 │   ├── reatancia/                # Secao 3/4/6b: metodo da reatancia aparente
-│   │   ├── metodo_reatancia.py   # formulas: simples, compensacao K0, correcao de offset
+│   │   ├── metodo_reatancia.py   # formulas: simples, compensacao K0, correcao EXATA de offset (sistema 2x2)
 │   │   ├── estudo_monofasico.py  # orquestra a Secao 3 (trecho monofasico)
 │   │   ├── estudo_trifasico.py   # orquestra a Secao 4 (trecho trifasico, 5 variantes)
 │   │   └── estudo_compensada_corrigida.py  # orquestra a Secao 6b (alimentador inteiro)
@@ -137,15 +137,18 @@ logo em seguida.
       simples (sem/com cargas) — ver `resultados/03_trecho_monofasico/LEIA-ME.md`.
 - [x] Seção 4 — Trecho trifásico: extração com geometria Cemig aplicada,
       fluxo/curva horária e as 5 variantes do método da reatância
-      (com/sem carga × com/sem compensação K0 × correção do offset) —
-      ver `resultados/04_trecho_trifasico/LEIA-ME.md`.
+      (com/sem carga × com/sem compensação K0 × correção EXATA do offset,
+      resolvendo s e Rf como sistema de 2 equações — ver Apêndice C do
+      texto do TCC) — ver `resultados/04_trecho_trifasico/LEIA-ME.md`.
 - [x] Seção 5 — Efeito da resistência de falta: 10 barras × 4 valores de Rf
       no trecho monofásico, e superfície 3D (Rf × diferença angular Z0/Z1)
       no trecho trifásico — ver `resultados/05_resistencia_falta/LEIA-ME.md`.
 - [x] Seção 6a — Método de Takagi compensado (tensão no relé + compensação
       K0) nas 300 barras MT do alimentador, agrupadas em
       ramificação/folha/aleatória/global — ver `resultados/06_takagi/LEIA-ME.md`.
-- [x] Seção 6b — Método da reatância compensada e corrigida, mesma
-      amostragem do alimentador inteiro — ver
-      `resultados/07_reatancia_compensada_corrigida/LEIA-ME.md` (inclui
-      uma limitação de calibração importante, documentada ali).
+- [x] Seção 6b — Método da reatância compensada com correção EXATA do
+      offset, mesma amostragem do alimentador inteiro — ver
+      `resultados/07_reatancia_compensada_corrigida/LEIA-ME.md`. Com a
+      correção exata, supera o Takagi (Seção 6a) nos 4 grupos de barras
+      (MAE 1,4–2,4x menor); uma versão anterior com correção aproximada
+      tinha viés sistemático de ~2,2 km — achado documentado no LEIA-ME.

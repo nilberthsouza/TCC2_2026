@@ -1,7 +1,8 @@
 """
 Secao 6b: metodo da reatancia aparente com compensacao de sequencia zero
-(K0) e correcao do offset de resistencia de falta, aplicado a barras de
-ramificacao, barras folha e barras aleatorias do alimentador completo
+(K0) e correcao EXATA do offset de resistencia de falta (sistema de duas
+equacoes reais, ver tcc2026.reatancia.metodo_reatancia), aplicado a barras
+de ramificacao, barras folha e barras aleatorias do alimentador completo
 (JMLT310 reduzido) — mesma amostragem e estrutura da Secao 6a (Takagi).
 """
 import random
@@ -33,7 +34,7 @@ def preparar_amostras_e_medidas(pasta_saida: Path, rf_ohm: float = RF_PADRAO_OHM
         pasta_saida: pasta de resultados desta secao.
         rf_ohm: resistencia de falta usada em todas as simulacoes (ohms).
     Saida:
-        dicionario com "medidas", "categorias", "x1_ref_ohm_km", "k0_corrigido".
+        dicionario com "medidas", "categorias", "z1_ohm_km", "z0_ohm_km".
     """
     # Aquece o cache ANTES de compilar qualquer alimentador real: o calculo
     # usa um circuito OpenDSS auxiliar que substituiria (singleton COM) o
@@ -60,20 +61,19 @@ def preparar_amostras_e_medidas(pasta_saida: Path, rf_ohm: float = RF_PADRAO_OHM
 
     medidas = vf.executar_varredura(dss, grafo, origem, barras_mt, rf_ohm)
 
-    x1_ref = mr.x1_medio_ponderado_trecho(dss, grafo)
     dados_geo = ge.calcular_parametros_sequencia_losangular_cemig()
     z1 = complex(dados_geo["r1_ohm_km"], dados_geo["x1_ohm_km"])
     z0 = complex(dados_geo["r0_ohm_km"], dados_geo["x0_ohm_km"])
-    z0_corrigido = mr.z0_corrigido_para_anular_offset(z1, z0)
-    k0_corrigido = mr.fator_compensacao_k0(z1, z0_corrigido)
 
-    return {"medidas": medidas, "categorias": categorias, "x1_ref_ohm_km": x1_ref, "k0_corrigido": k0_corrigido}
+    return {"medidas": medidas, "categorias": categorias, "z1_ohm_km": z1, "z0_ohm_km": z0}
 
 
 def montar_resultados(preparo: dict) -> pd.DataFrame:
     """
-    Calcula a distancia estimada pelo metodo da reatancia compensada e
-    corrigida para cada barra medida.
+    Calcula a distancia estimada pelo metodo da reatancia compensada com
+    correcao EXATA do offset de resistencia de falta (ver
+    tcc2026.reatancia.metodo_reatancia.distancia_reatancia_corrigida_exata)
+    para cada barra medida.
 
     Entradas:
         preparo: dicionario devolvido por preparar_amostras_e_medidas.
@@ -81,14 +81,15 @@ def montar_resultados(preparo: dict) -> pd.DataFrame:
         DataFrame com barra, distancia_real_km, distancia_estimada_km.
     """
     medidas = preparo["medidas"].copy()
-    k0_corrigido = preparo["k0_corrigido"]
-    x1_ref = preparo["x1_ref_ohm_km"]
+    z1 = preparo["z1_ohm_km"]
+    z0 = preparo["z0_ohm_km"]
+    k0 = mr.fator_compensacao_k0(z1, z0)
 
     medidas["distancia_estimada_km"] = medidas.apply(
-        lambda linha: mr.distancia_reatancia_compensada(
+        lambda linha: mr.distancia_reatancia_corrigida_exata(
             linha["va_pos"],
-            mr.corrente_compensada(linha["ia_pos"], linha["i0_pos"], k0_corrigido),
-            x1_ref,
+            mr.corrente_compensada(linha["ia_pos"], linha["i0_pos"], k0),
+            z1, z0,
         ), axis=1
     )
     return medidas
