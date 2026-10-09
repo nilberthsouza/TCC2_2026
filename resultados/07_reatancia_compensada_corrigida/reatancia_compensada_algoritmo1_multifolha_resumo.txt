@@ -1,0 +1,14 @@
+% Contexto: Secao 6b - Algoritmo 1 (avaliacao de caminho) aplicado em modo multi-folha real, sem usar a distancia real para escolher o vencedor.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Algoritmo 1 em modo multi-folha (reatância compensada e corrigida): faltas nas barras folha, avaliadas contra todas as folhas candidatas}
+  \label{tab:reatancia_algoritmo1_multifolha}
+  \begin{tabular}{cccc}
+    \toprule
+    \textbf{N folhas} & \textbf{Discriminação única (\%)} & \textbf{Folha correta válida (\%)} & \textbf{Média folhas válidas} \\
+    \midrule
+    34 & 2{,}9 & 94{,}1 & 17{,}47 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

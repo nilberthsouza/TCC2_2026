@@ -1,0 +1,14 @@
+% Contexto: Secao 6a - Algoritmo 1 (avaliacao de caminho) aplicado em modo multi-folha real, sem usar a distancia real para escolher o vencedor.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Algoritmo 1 em modo multi-folha: faltas simuladas nas barras folha, avaliadas contra todas as folhas candidatas}
+  \label{tab:takagi_algoritmo1_multifolha}
+  \begin{tabular}{cccc}
+    \toprule
+    \textbf{N folhas} & \textbf{Discriminação única (\%)} & \textbf{Folha correta válida (\%)} & \textbf{Média folhas válidas} \\
+    \midrule
+    34 & 2{,}9 & 97{,}1 & 16{,}59 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

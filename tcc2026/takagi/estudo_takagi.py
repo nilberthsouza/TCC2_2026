@@ -11,9 +11,9 @@ import pandas as pd
 import seaborn as sns
 
 from tcc2026.extracao import extrator_trecho as et
-from tcc2026.nucleo import (amostragem_barras as ab, dss_core, geometria_eletrica as ge,
-                             graficos, grafo_alimentador as ga, latex_utils, metricas,
-                             varredura_falta_rele as vf)
+from tcc2026.nucleo import (amostragem_barras as ab, avaliacao_multifolha as amf, dss_core,
+                             geometria_eletrica as ge, graficos, grafo_alimentador as ga,
+                             latex_utils, metricas, varredura_falta_rele as vf)
 from tcc2026.reatancia import metodo_reatancia as mr
 from tcc2026.takagi import metodo_takagi as mt
 
@@ -59,7 +59,8 @@ def preparar_amostras_e_medidas(pasta_saida: Path, rf_ohm: float = RF_PADRAO_OHM
         rf_ohm: resistencia de falta usada em todas as simulacoes (ohms).
     Saida:
         dicionario com "medidas" (DataFrame bruto da varredura, ver
-        varredura_falta_rele.executar_varredura), "categorias", "z1_ohm_km".
+        varredura_falta_rele.executar_varredura), "categorias", "z1_ohm_km",
+        "grafo" e "origem".
     """
     preparo = preparar_alimentador_geometria_cemig(pasta_saida)
     dss = et.compilar_subalimentador(preparo["caminho_master"])
@@ -80,7 +81,7 @@ def preparar_amostras_e_medidas(pasta_saida: Path, rf_ohm: float = RF_PADRAO_OHM
     z0_ohm_km = complex(dados_geo["r0_ohm_km"], dados_geo["x0_ohm_km"])
 
     return {"medidas": medidas, "categorias": categorias,
-            "z1_ohm_km": z1_ohm_km, "z0_ohm_km": z0_ohm_km, "origem": origem}
+            "z1_ohm_km": z1_ohm_km, "z0_ohm_km": z0_ohm_km, "origem": origem, "grafo": grafo}
 
 
 def montar_resultados_takagi(preparo: dict) -> pd.DataFrame:
@@ -206,4 +207,65 @@ def executar_amostragem_e_estudo(pasta_saida: Path) -> dict:
         "Distribuição do erro (estimado − real) do método de Takagi compensado, pelos 4 grupos de barras."
     )
 
-    return {"tabela": tabela, "tabela_metricas": tabela_metricas}
+    tabela_multifolha, resumo_multifolha = avaliar_algoritmo1_multifolha(preparo, categorias, pasta_saida)
+
+    return {"tabela": tabela, "tabela_metricas": tabela_metricas,
+            "tabela_multifolha": tabela_multifolha, "resumo_multifolha": resumo_multifolha}
+
+
+def avaliar_algoritmo1_multifolha(preparo: dict, categorias: dict, pasta_saida: Path) -> tuple:
+    """
+    Avalia o Algoritmo 1 em modo multi-folha real (Secao 3.3.1 do TCC):
+    para cada falta simulada em uma barra folha MT, avalia a formula de
+    Takagi compensado contra TODAS as folhas candidatas do alimentador
+    (nao so a correta), contando quantas produzem uma distancia valida
+    (0<=d_mi<=L). Estatistica global de quao bem o criterio de validade,
+    isoladamente, discrimina o ramo correto da falta.
+
+    Entradas:
+        preparo: dicionario devolvido por preparar_amostras_e_medidas
+            (precisa de "medidas", "grafo", "origem").
+        categorias: dicionario {barra: categoria} (ver
+            grafo_alimentador.classificar_barras), restrito a barras MT.
+        pasta_saida: pasta de resultados desta secao.
+    Saida:
+        tupla (tabela_multifolha, resumo_multifolha): DataFrame por barra
+        de falta e dicionario com as taxas agregadas.
+    """
+    folhas_mt = sorted(b for b, c in categorias.items() if c == "folha_mt")
+    impedancias_folhas = amf.impedancias_por_folha(preparo["grafo"], preparo["origem"], folhas_mt)
+    medidas_folhas = preparo["medidas"][preparo["medidas"]["barra"].isin(folhas_mt)]
+
+    def _avaliar_takagi(falta, z1l, z0l, l_km):
+        return amf.avaliar_algoritmo1_caminho_takagi(
+            falta["va_pos"], falta["ia_pos"], falta["ia_pre"],
+            falta["i0_pos"], falta["i0_pre"], z1l, z0l, l_km)
+
+    tabela_multifolha = amf.avaliar_multifolha(medidas_folhas, impedancias_folhas, _avaliar_takagi)
+    tabela_multifolha.to_csv(pasta_saida / "takagi_algoritmo1_multifolha.csv", index=False)
+
+    resumo_multifolha = {
+        "n_folhas": len(folhas_mt),
+        "taxa_discriminacao_unica": float((tabela_multifolha["n_validas"] == 1).mean()),
+        "taxa_folha_correta_valida": float(tabela_multifolha["folha_correta_valida"].mean()),
+        "media_n_validas": float(tabela_multifolha["n_validas"].mean()),
+    }
+    pd.DataFrame([resumo_multifolha]).to_csv(pasta_saida / "takagi_algoritmo1_multifolha_resumo.csv", index=False)
+    latex_utils.salvar_tabela_latex(
+        pd.DataFrame([resumo_multifolha]).rename(columns={
+            "n_folhas": "N folhas", "taxa_discriminacao_unica": "Discriminação única (\\%)",
+            "taxa_folha_correta_valida": "Folha correta válida (\\%)", "media_n_validas": "Média folhas válidas",
+        }).assign(**{
+            "Discriminação única (\\%)": lambda d: d["Discriminação única (\\%)"] * 100,
+            "Folha correta válida (\\%)": lambda d: d["Folha correta válida (\\%)"] * 100,
+        }),
+        pasta_saida / "takagi_algoritmo1_multifolha_resumo.txt",
+        legenda="Algoritmo 1 em modo multi-folha: faltas simuladas nas barras folha, avaliadas contra todas as folhas candidatas",
+        rotulo="takagi_algoritmo1_multifolha",
+        contexto="Secao 6a - Algoritmo 1 (avaliacao de caminho) aplicado em modo multi-folha real, "
+                 "sem usar a distancia real para escolher o vencedor.",
+        decimais={"N folhas": 0, "Discriminação única (\\%)": 1, "Folha correta válida (\\%)": 1,
+                  "Média folhas válidas": 2},
+        alinhamento="cccc",
+    )
+    return tabela_multifolha, resumo_multifolha

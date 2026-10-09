@@ -13,9 +13,9 @@ import pandas as pd
 import seaborn as sns
 
 from tcc2026.extracao import extrator_trecho as et
-from tcc2026.nucleo import (amostragem_barras as ab, dss_core, geometria_eletrica as ge,
-                             graficos, grafo_alimentador as ga, latex_utils, metricas,
-                             varredura_falta_rele as vf)
+from tcc2026.nucleo import (amostragem_barras as ab, avaliacao_multifolha as amf, dss_core,
+                             geometria_eletrica as ge, graficos, grafo_alimentador as ga,
+                             latex_utils, metricas, varredura_falta_rele as vf)
 from tcc2026.reatancia import metodo_reatancia as mr
 
 RF_PADRAO_OHM = 0.01
@@ -65,7 +65,8 @@ def preparar_amostras_e_medidas(pasta_saida: Path, rf_ohm: float = RF_PADRAO_OHM
     z1 = complex(dados_geo["r1_ohm_km"], dados_geo["x1_ohm_km"])
     z0 = complex(dados_geo["r0_ohm_km"], dados_geo["x0_ohm_km"])
 
-    return {"medidas": medidas, "categorias": categorias, "z1_ohm_km": z1, "z0_ohm_km": z0}
+    return {"medidas": medidas, "categorias": categorias, "z1_ohm_km": z1, "z0_ohm_km": z0,
+            "grafo": grafo, "origem": origem}
 
 
 def montar_resultados(preparo: dict) -> pd.DataFrame:
@@ -196,4 +197,64 @@ def executar_amostragem_e_estudo(pasta_saida: Path) -> dict:
         "Distribuição do erro (estimado − real) do método da reatância compensada e corrigida, pelos 4 grupos de barras."
     )
 
-    return {"tabela": tabela, "tabela_metricas": tabela_metricas}
+    tabela_multifolha, resumo_multifolha = avaliar_algoritmo1_multifolha(preparo, categorias, pasta_saida)
+
+    return {"tabela": tabela, "tabela_metricas": tabela_metricas,
+            "tabela_multifolha": tabela_multifolha, "resumo_multifolha": resumo_multifolha}
+
+
+def avaliar_algoritmo1_multifolha(preparo: dict, categorias: dict, pasta_saida: Path) -> tuple:
+    """
+    Avalia o Algoritmo 1 em modo multi-folha real (Secao 3.3.1 do TCC),
+    pela formula da reatancia compensada e corrigida: para cada falta
+    simulada em uma barra folha MT, avalia a formula contra TODAS as
+    folhas candidatas do alimentador (nao so a correta), contando quantas
+    produzem uma distancia valida (0<=d_mi<=L). Mesma logica aplicada ao
+    Takagi na Secao 6a (ver tcc2026.takagi.estudo_takagi.avaliar_algoritmo1_multifolha).
+
+    Entradas:
+        preparo: dicionario devolvido por preparar_amostras_e_medidas
+            (precisa de "medidas", "grafo", "origem").
+        categorias: dicionario {barra: categoria}, restrito a barras MT.
+        pasta_saida: pasta de resultados desta secao.
+    Saida:
+        tupla (tabela_multifolha, resumo_multifolha).
+    """
+    folhas_mt = sorted(b for b, c in categorias.items() if c == "folha_mt")
+    impedancias_folhas = amf.impedancias_por_folha(preparo["grafo"], preparo["origem"], folhas_mt)
+    medidas_folhas = preparo["medidas"][preparo["medidas"]["barra"].isin(folhas_mt)]
+
+    def _avaliar_reatancia(falta, z1l, z0l, l_km):
+        return amf.avaliar_algoritmo1_caminho_reatancia(
+            falta["va_pos"], falta["ia_pos"], falta["i0_pos"], z1l, z0l, l_km)
+
+    tabela_multifolha = amf.avaliar_multifolha(medidas_folhas, impedancias_folhas, _avaliar_reatancia)
+    tabela_multifolha.to_csv(pasta_saida / "reatancia_compensada_algoritmo1_multifolha.csv", index=False)
+
+    resumo_multifolha = {
+        "n_folhas": len(folhas_mt),
+        "taxa_discriminacao_unica": float((tabela_multifolha["n_validas"] == 1).mean()),
+        "taxa_folha_correta_valida": float(tabela_multifolha["folha_correta_valida"].mean()),
+        "media_n_validas": float(tabela_multifolha["n_validas"].mean()),
+    }
+    pd.DataFrame([resumo_multifolha]).to_csv(
+        pasta_saida / "reatancia_compensada_algoritmo1_multifolha_resumo.csv", index=False)
+    latex_utils.salvar_tabela_latex(
+        pd.DataFrame([resumo_multifolha]).rename(columns={
+            "n_folhas": "N folhas", "taxa_discriminacao_unica": "Discriminação única (\\%)",
+            "taxa_folha_correta_valida": "Folha correta válida (\\%)", "media_n_validas": "Média folhas válidas",
+        }).assign(**{
+            "Discriminação única (\\%)": lambda d: d["Discriminação única (\\%)"] * 100,
+            "Folha correta válida (\\%)": lambda d: d["Folha correta válida (\\%)"] * 100,
+        }),
+        pasta_saida / "reatancia_compensada_algoritmo1_multifolha_resumo.txt",
+        legenda="Algoritmo 1 em modo multi-folha (reatância compensada e corrigida): faltas nas barras folha, "
+                "avaliadas contra todas as folhas candidatas",
+        rotulo="reatancia_algoritmo1_multifolha",
+        contexto="Secao 6b - Algoritmo 1 (avaliacao de caminho) aplicado em modo multi-folha real, "
+                 "sem usar a distancia real para escolher o vencedor.",
+        decimais={"N folhas": 0, "Discriminação única (\\%)": 1, "Folha correta válida (\\%)": 1,
+                  "Média folhas válidas": 2},
+        alinhamento="cccc",
+    )
+    return tabela_multifolha, resumo_multifolha
