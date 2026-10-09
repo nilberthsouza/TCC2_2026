@@ -26,7 +26,9 @@ TCC2_2026/
 │   │   ├── metricas.py         # MAE, RMSE, R2, erro max/medio, desvio padrao
 │   │   ├── graficos.py         # estilo seaborn padrao do projeto + salvamento com descricao
 │   │   ├── latex_utils.py      # tabelas LaTeX (estilo booktabs) + .txt individuais
-│   │   └── falta_injecao.py    # objeto Fault do OpenDSS + leitura de V/I no rele
+│   │   ├── falta_injecao.py    # objeto Fault do OpenDSS + leitura de V/I no rele
+│   │   ├── amostragem_barras.py   # selecao de barras ramificacao/folha/aleatorias
+│   │   └── varredura_falta_rele.py # varre uma lista de barras medindo V/I pre/pos-falta
 │   ├── topologia/
 │   │   └── visao_geral.py      # Secao 1: fluxo de potencia, curva horaria, topologia MT
 │   ├── faltas/                 # Secao 2: tabela de 3 barras (Thevenin/curto-circuito)
@@ -39,7 +41,9 @@ TCC2_2026/
 │   │   ├── metodo_reatancia.py   # formulas: simples, compensacao K0, correcao de offset
 │   │   ├── estudo_monofasico.py  # orquestra a Secao 3 (trecho monofasico)
 │   │   └── estudo_trifasico.py   # orquestra a Secao 4 (trecho trifasico, 5 variantes)
-│   ├── takagi/                   # metodo de Takagi (corrente e tensao, compensado)
+│   ├── takagi/                   # Secao 6a: metodo de Takagi (corrente e tensao, compensado)
+│   │   ├── metodo_takagi.py      # formula (com e sem compensacao K0)
+│   │   └── estudo_takagi.py      # orquestra a Secao 6a (300 barras MT, 4 grupos)
 │   └── resistencia_falta/
 │       └── efeito_rf.py          # Secao 5: Rf no trecho 1f (10 barras) e superficie 3D no trecho 3f
 └── resultados/                  # saida de cada secao: CSVs, graficos .png e tabelas .tex/.txt
@@ -131,8 +135,7 @@ logo em seguida.
 - [x] Seção 5 — Efeito da resistência de falta: 10 barras × 4 valores de Rf
       no trecho monofásico, e superfície 3D (Rf × diferença angular Z0/Z1)
       no trecho trifásico — ver `resultados/05_resistencia_falta/LEIA-ME.md`.
-- [ ] Seção 3 — Trecho monofásico: extração, fluxo, reatância aparente.
-- [ ] Seção 4 — Trecho trifásico: extração, reatância com/sem compensação.
-- [ ] Seção 5 — Efeito da resistência de falta.
-- [ ] Seção 6 — Takagi com compensação de tensão + reatância com correção
-      de offset (barras de ramificação/folha/aleatórias).
+- [x] Seção 6a — Método de Takagi compensado (tensão no relé + compensação
+      K0) nas 300 barras MT do alimentador, agrupadas em
+      ramificação/folha/aleatória/global — ver `resultados/06_takagi/LEIA-ME.md`.
+- [ ] Seção 6b — Método da reatância compensada e corrigida, mesma amostragem.

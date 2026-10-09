@@ -1,0 +1,6 @@
+{
+  "takagi_ramificacao.png": "Distância real x estimada (método de Takagi compensado) em 20 barras de ramificação.",
+  "takagi_folha.png": "Distância real x estimada (método de Takagi compensado) em 20 barras folha.",
+  "takagi_aleatoria.png": "Distância real x estimada (método de Takagi compensado) em 20 barras aleatórias (semente fixa).",
+  "takagi_boxplot.png": "Distribuição do erro (estimado − real) do método de Takagi compensado, pelos 4 grupos de barras."
+}

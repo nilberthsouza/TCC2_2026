@@ -1,0 +1,17 @@
+Clear
+New Circuit.JMLT310_GEOM basekv=13.800000 bus1="SEGM#194789369.1.2.3" phases=3 pu=1.000000 angle=0.0045 frequency=60 r1=0.0 x1=0.0001
+Redirect "linecodes_extraido.dss"
+Redirect "geometria_cemig.dss"
+Redirect "transformadores_extraido.dss"
+Redirect "linhas_extraido.dss"
+Redirect "curvacarga_extraido.dss"
+Redirect "cargas_extraido.dss"
+Set mode=daily
+Set Voltagebases=[0.22 0.24 13.8]
+Calc Voltagebases
+Set tolerance=0.0001
+Set algorithm=newton
+Set maxiterations=100
+Set number=1
+Set hour=0
+Solve

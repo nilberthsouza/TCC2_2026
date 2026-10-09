@@ -15,6 +15,7 @@ from tcc2026.topologia import visao_geral
 from tcc2026.faltas import tabela_barras
 from tcc2026.reatancia import estudo_monofasico, estudo_trifasico
 from tcc2026.resistencia_falta import efeito_rf
+from tcc2026.takagi import estudo_takagi
 
 SECOES_DISPONIVEIS = {
     "visao_geral": ("01_visao_geral", lambda pasta: visao_geral.executar_visao_geral(pasta)),
@@ -22,6 +23,7 @@ SECOES_DISPONIVEIS = {
     "trecho_monofasico": ("03_trecho_monofasico", lambda pasta: estudo_monofasico.executar_estudo_monofasico(pasta)),
     "trecho_trifasico": ("04_trecho_trifasico", lambda pasta: estudo_trifasico.executar_estudo_trifasico(pasta)),
     "resistencia_falta": ("05_resistencia_falta", lambda pasta: efeito_rf.executar_efeito_resistencia_falta(pasta)),
+    "takagi": ("06_takagi", lambda pasta: estudo_takagi.executar_amostragem_e_estudo(pasta)),
 }
 
 

@@ -1,0 +1,17 @@
+% Contexto: Secao 6a - metricas do metodo de Takagi compensado, populacao completa de cada grupo.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Erros do método de Takagi compensado, por grupo de barras (JMLT310 reduzido)}
+  \label{tab:takagi_metricas}
+  \begin{tabular}{lccccccc}
+    \toprule
+    \textbf{Grupo} & \textbf{N} & \textbf{MAE (km)} & \textbf{RMSE (km)} & \textbf{R²} & \textbf{Erro Máx. (km)} & \textbf{Erro Médio (km)} & \textbf{Desvio Padrão (km)} \\
+    \midrule
+    Ramificação & 161 & 0{,}0572 & 0{,}1124 & 0{,}9969 & 0{,}6634 & -0{,}0572 & 0{,}0967 \\
+    Folha & 34 & 0{,}0264 & 0{,}0330 & 0{,}9998 & 0{,}0822 & -0{,}0264 & 0{,}0198 \\
+    Aleatória & 100 & 0{,}0878 & 0{,}1803 & 0{,}9916 & 0{,}8614 & -0{,}0878 & 0{,}1575 \\
+    Global (todas as barras) & 300 & 0{,}0877 & 0{,}1844 & 0{,}9918 & 1{,}2534 & -0{,}0877 & 0{,}1622 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
