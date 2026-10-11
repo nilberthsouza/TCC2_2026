@@ -15,7 +15,7 @@ from tcc2026.topologia import visao_geral
 from tcc2026.faltas import tabela_barras
 from tcc2026.reatancia import estudo_compensada_corrigida, estudo_monofasico, estudo_trifasico
 from tcc2026.resistencia_falta import efeito_rf
-from tcc2026.takagi import estudo_takagi
+from tcc2026.takagi import estudo_takagi, estudo_votacao
 
 SECOES_DISPONIVEIS = {
     "visao_geral": ("01_visao_geral", lambda pasta: visao_geral.executar_visao_geral(pasta)),
@@ -27,6 +27,7 @@ SECOES_DISPONIVEIS = {
     "reatancia_compensada_corrigida": (
         "07_reatancia_compensada_corrigida",
         lambda pasta: estudo_compensada_corrigida.executar_amostragem_e_estudo(pasta)),
+    "votacao_multifolha": ("08_votacao_multifolha", lambda pasta: estudo_votacao.executar_estudo_votacao(pasta)),
 }
 
 

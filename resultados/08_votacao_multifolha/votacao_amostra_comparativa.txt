@@ -1,0 +1,37 @@
+% Contexto: Secao 8 - comparacao lado a lado Takagi x reatancia, consolidacao por votacao, amostra de barras.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Comparação lado a lado entre Takagi compensado e reatância compensada e corrigida, consolidação por votação (Algoritmo 3), amostra de barras.}
+  \label{tab:votacao_amostra}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{llc ccc ccc}
+    \toprule
+    & & & \multicolumn{3}{c}{\textbf{Takagi compensado}} & \multicolumn{3}{c}{\textbf{Reatância compensada e corrigida}} \\
+    \cmidrule(lr){4-6} \cmidrule(lr){7-9}
+    \textbf{Categoria} & \textbf{Barra} & \textbf{$d_{real}$ (km)} & \textbf{$d_{est}$ (km)} & \textbf{Erro (\%)} & \textbf{Votos} & \textbf{$d_{est}$ (km)} & \textbf{Erro (\%)} & \textbf{Votos} \\
+    \midrule
+    Ramificação & NODE#424244008 & 0,048 & 0,0398 & -17,13\% & 33/33 & 0,0482 & +0,23\% & 33/33 \\
+    Ramificação & NODE#445009506 & 3,498 & 3,4835 & -0,43\% & 21/21 & 3,4942 & -0,12\% & 21/21 \\
+    Ramificação & NODE#434807045 & 4,957 & 4,9244 & -0,66\% & 8/14 & 4,9386 & -0,37\% & 8/14 \\
+    Ramificação & NODE#433473497 & 5,983 & 5,9431 & -0,66\% & 5/10 & 5,9589 & -0,40\% & 5/10 \\
+    Ramificação & NODE#442498126 & 6,793 & 6,7547 & -0,57\% & 3/6 & 6,7706 & -0,34\% & 3/6 \\
+    Ramificação & NODE#728593131 & 8,374 & --- & --- & sem solução & --- & --- & sem solução \\
+    Folha & SEGM#194790109 & 0,001 & --- & --- & sem solução & 0,0011 & +11,41\% & 33/33 \\
+    Folha & NODE#424245027 & 1,435 & 1,4263 & -0,63\% & 26/27 & 1,4349 & -0,03\% & 26/27 \\
+    Folha & NODE#125828784 & 4,404 & 4,3894 & -0,32\% & 19/21 & 4,3995 & -0,09\% & 18/21 \\
+    Folha & NODE#118744227 & 5,554 & 5,5312 & -0,41\% & 8/14 & 5,5435 & -0,19\% & 7/14 \\
+    Folha & NODE#535524539 & 6,459 & 6,4059 & -0,82\% & 4/8 & 6,4242 & -0,54\% & 4/8 \\
+    Folha & NODE#1194264563 & 8,079 & 8,0204 & -0,73\% & 1/1 & 8,0408 & -0,48\% & 1/1 \\
+    Aleatória & NODE#424245856 & 2,710 & 2,7007 & -0,35\% & 24/24 & 2,7096 & -0,03\% & 24/24 \\
+    Aleatória & NODE#127688187 & 5,914 & 5,8864 & -0,47\% & 6/11 & 5,8999 & -0,24\% & 6/11 \\
+    Aleatória & NODE#433473032 & 3,660 & 3,6415 & -0,51\% & 19/21 & 3,6530 & -0,20\% & 19/21 \\
+    Aleatória & NODE#433471813 & 7,769 & 7,7194 & -0,64\% & 1/3 & 7,7379 & -0,40\% & 1/3 \\
+    Aleatória & NODE#433471004 & 3,659 & 3,6402 & -0,52\% & 19/21 & 3,6517 & -0,20\% & 19/21 \\
+    Aleatória & NODE#424246733 & 6,064 & 6,0236 & -0,67\% & 5/10 & 6,0394 & -0,41\% & 5/10 \\
+    \bottomrule
+  \end{tabular}
+  }
+  \fonte{Elaborado pelo autor.}
+\end{table}

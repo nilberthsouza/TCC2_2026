@@ -1,14 +1,21 @@
 """
 Avaliacao do Algoritmo 1 (avaliacao de um caminho rele-folha) em modo
-multi-folha real: para cada falta simulada em uma barra folha MT, avalia a
+multi-folha real: para cada falta simulada em uma barra MT, avalia a
 formula de localizacao contra TODAS as folhas candidatas do alimentador
-(nao so a folha onde a falta realmente ocorreu), contando quantas delas
-produzem uma distancia valida (0<=d_mi<=L, Algoritmo 1 da Secao 3.2 do
-TCC). Mede, assim, quao bem o criterio de validade por si so discrimina o
-ramo correto da falta, sem usar a distancia real para escolher o
-vencedor -- diferente das demais secoes deste projeto, que avaliam a
-formula apenas no caminho correto (ja conhecido por construcao).
+(nao so a folha/caminho correto), contando quantas delas produzem uma
+distancia valida (0<=d_mi<=L, Algoritmo 1 da Secao 3.2 do TCC). Mede,
+assim, quao bem o criterio de validade por si so discrimina o ramo
+correto da falta, sem usar a distancia real para escolher o vencedor --
+diferente das demais secoes deste projeto, que avaliam a formula apenas
+no caminho correto (ja conhecido por construcao).
+
+Tambem implementa o procedimento completo de consolidacao por votacao do
+Algoritmo 3 (alg:takagi_multifolha): cada caminho candidato valido "vota"
+na barra mais proxima do seu proprio caminho rele-folha, e o resultado
+final e a barra mais votada (consolidacao por maior concordancia).
 """
+import statistics
+
 import pandas as pd
 
 from tcc2026.nucleo import geometria_eletrica as ge, grafo_alimentador as ga
@@ -149,4 +156,137 @@ def avaliar_multifolha(medidas_folhas: pd.DataFrame, impedancias: dict, avaliar_
             "folha_correta_valida": correto_valido,
             "erro_km_correto": d_correto - falta["distancia_real_km"],
         })
+    return pd.DataFrame(linhas)
+
+
+def caminho_distancias_por_folha(grafo, origem: str, folhas: list) -> dict:
+    """
+    Para cada folha candidata, monta a lista ordenada de barras do caminho
+    rele-folha com a respectiva distancia acumulada (km) desde o rele --
+    usada para mapear uma distancia estimada d_mi a barra mais proxima ao
+    longo desse caminho especifico (ver bus_mais_proximo).
+
+    Entradas:
+        grafo: grafo eletrico do alimentador.
+        origem: barra de origem (posicao do rele).
+        folhas: lista de barras folha candidatas.
+    Saida:
+        dicionario {folha: [(barra, distancia_acumulada_km), ...]}, na
+        ordem do rele ate a folha (primeiro par e sempre (origem, 0.0)).
+    """
+    resultado = {}
+    for folha in folhas:
+        caminho = ga.caminho_entre_barras(grafo, origem, folha)
+        distancia = 0.0
+        lista = [(origem, 0.0)]
+        for a, b in zip(caminho[:-1], caminho[1:]):
+            dados = grafo.edges[a, b]
+            if dados["tipo"] == "linha":
+                distancia += dados["comprimento_km"]
+            lista.append((b, distancia))
+        resultado[folha] = lista
+    return resultado
+
+
+def bus_mais_proximo(caminho_distancias: list, d_mi_km: float) -> tuple:
+    """
+    Encontra a barra do caminho (lista de (barra, distancia_acumulada_km))
+    cuja distancia acumulada esta mais proxima de d_mi_km.
+
+    Entradas:
+        caminho_distancias: lista devolvida por caminho_distancias_por_folha
+            para uma folha especifica.
+        d_mi_km: distancia estimada pelo Algoritmo 1 para o caminho dessa folha.
+    Saida:
+        tupla (barra, distancia_acumulada_km) do ponto mais proximo.
+    """
+    return min(caminho_distancias, key=lambda par: abs(par[1] - d_mi_km))
+
+
+def votar_consolidado(falta, impedancias: dict, caminhos_distancias: dict, avaliar_caminho_fn) -> dict | None:
+    """
+    Aplica o Algoritmo 3 (consolidacao por votacao) a uma unica falta: avalia
+    o Algoritmo 1 contra todas as folhas candidatas, mapeia cada estimativa
+    valida para a barra mais proxima do respectivo caminho (voto), e
+    consolida pela barra mais votada -- sem usar a distancia real da falta
+    em nenhuma etapa.
+
+    Entradas:
+        falta: Series/dict com os fasores medidos no rele (colunas exigidas
+            por avaliar_caminho_fn).
+        impedancias: dicionario devolvido por impedancias_por_folha.
+        caminhos_distancias: dicionario devolvido por caminho_distancias_por_folha
+            (mesmo conjunto de folhas de impedancias).
+        avaliar_caminho_fn: funcao(falta, z1l, z0l, l_km) -> dict (ver
+            avaliar_algoritmo1_caminho_takagi/_reatancia).
+    Saida:
+        None se nenhum caminho candidato for valido ("sem solucao"), ou
+        dicionario com "barra_vencedora", "distancia_estimada_km" (mediana
+        dos votos vencedores), "votos_vencedor", "votos_totais" (validos) e
+        "n_candidatos_distintos" (barras distintas que receberam voto).
+    """
+    votos: dict[str, list[float]] = {}
+    total_validos = 0
+    for folha, imp in impedancias.items():
+        avaliacao = avaliar_caminho_fn(falta, imp["z1l"], imp["z0l"], imp["l_km"])
+        if not avaliacao["valido"]:
+            continue
+        total_validos += 1
+        barra, _ = bus_mais_proximo(caminhos_distancias[folha], avaliacao["d_mi_km"])
+        votos.setdefault(barra, []).append(avaliacao["d_mi_km"])
+
+    if total_validos == 0:
+        return None
+
+    barra_vencedora, lista_d = max(votos.items(), key=lambda kv: len(kv[1]))
+    return {
+        "barra_vencedora": barra_vencedora,
+        "distancia_estimada_km": statistics.median(lista_d),
+        "votos_vencedor": len(lista_d),
+        "votos_totais": total_validos,
+        "n_candidatos_distintos": len(votos),
+    }
+
+
+def avaliar_votacao_populacao(medidas: pd.DataFrame, impedancias: dict, caminhos_distancias: dict,
+                               avaliar_caminho_fn) -> pd.DataFrame:
+    """
+    Aplica votar_consolidado a cada falta de uma populacao de barras
+    (tipicamente as 300 barras MT do alimentador completo), para obter
+    estatisticas globais de quantos candidatos distintos o criterio de
+    votacao deixa, e com que grau de consenso.
+
+    Entradas:
+        medidas: DataFrame com uma linha por barra de falta, colunas "barra",
+            "distancia_real_km" e as exigidas por avaliar_caminho_fn.
+        impedancias, caminhos_distancias: ver votar_consolidado.
+        avaliar_caminho_fn: ver votar_consolidado.
+    Saida:
+        DataFrame com uma linha por barra de falta: "barra", "distancia_real_km",
+        "barra_vencedora" (ou None), "distancia_estimada_km", "erro_km",
+        "votos_vencedor", "votos_totais", "n_candidatos_distintos",
+        "sem_solucao" (bool), "barra_correta_consolidada" (bool: a barra
+        vencedora e a propria barra de falta).
+    """
+    linhas = []
+    for _, falta in medidas.iterrows():
+        resultado = votar_consolidado(falta, impedancias, caminhos_distancias, avaliar_caminho_fn)
+        if resultado is None:
+            linhas.append({
+                "barra": falta["barra"], "distancia_real_km": falta["distancia_real_km"],
+                "barra_vencedora": None, "distancia_estimada_km": float("nan"), "erro_km": float("nan"),
+                "votos_vencedor": 0, "votos_totais": 0, "n_candidatos_distintos": 0,
+                "sem_solucao": True, "barra_correta_consolidada": False,
+            })
+        else:
+            linhas.append({
+                "barra": falta["barra"], "distancia_real_km": falta["distancia_real_km"],
+                "barra_vencedora": resultado["barra_vencedora"],
+                "distancia_estimada_km": resultado["distancia_estimada_km"],
+                "erro_km": resultado["distancia_estimada_km"] - falta["distancia_real_km"],
+                "votos_vencedor": resultado["votos_vencedor"], "votos_totais": resultado["votos_totais"],
+                "n_candidatos_distintos": resultado["n_candidatos_distintos"],
+                "sem_solucao": False,
+                "barra_correta_consolidada": resultado["barra_vencedora"] == falta["barra"],
+            })
     return pd.DataFrame(linhas)

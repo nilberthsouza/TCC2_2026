@@ -1,0 +1,15 @@
+% Contexto: Secao 8 - resumo global da consolidacao por votacao (Algoritmo 3), 300 barras MT, 34 folhas candidatas por falta.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Algoritmo 3 (votação multi-folha) nas 300 barras MT: resumo global por método}
+  \label{tab:votacao_resumo_global}
+  \begin{tabular}{lcccccc}
+    \toprule
+    \textbf{Método} & \textbf{N folhas} & \textbf{Candidatos distintos (média)} & \textbf{Sem solução (\%)} & \textbf{Concordância do vencedor (\%)} & \textbf{Acerto da barra (\%)} \\
+    \midrule
+    Takagi compensado & 34 & 2{,}59 & 4{,}3 & 67{,}1 & 13{,}3 \\
+    Reatância compensada e corrigida & 34 & 2{,}62 & 3{,}7 & 67{,}2 & 17{,}7 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
