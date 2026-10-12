@@ -177,6 +177,39 @@ def montar_tabela_comparativa_piores_linecodes(tabela_km: pd.DataFrame, tabela_e
     return tabela.sort_values("mae_media_km", ascending=False).reset_index(drop=True)
 
 
+def montar_tabela_parametros_linecodes(dss, tabela_comparativa: pd.DataFrame) -> pd.DataFrame:
+    """
+    Le, diretamente do objeto Linecode do OpenDSS, os parametros eletricos
+    (R1/X1/R0/X0/C1/C0/ampacidade/fases) de cada linecode da tabela
+    comparativa dos piores casos (sem nenhuma correcao aplicada por este
+    trabalho), para permitir uma conferencia visual rapida de valores
+    fisicamente implausiveis (possivel erro de preenchimento na BDGD).
+
+    Entradas:
+        dss: instancia do motor OpenDSS com o alimentador real compilado
+            (ver montar_grafo_real, SEM a geometria Cemig).
+        tabela_comparativa: DataFrame devolvido por
+            montar_tabela_comparativa_piores_linecodes.
+    Saida:
+        DataFrame com colunas "linecode", "fases", "r1_ohm_km", "x1_ohm_km",
+        "r0_ohm_km", "x0_ohm_km", "c1_nf_km", "c0_nf_km", "normamps",
+        "x1_r1", na mesma ordem de tabela_comparativa.
+    """
+    linecodes = dss.linecodes
+    linhas = []
+    for codigo in tabela_comparativa["linecode"]:
+        linecodes.name = codigo
+        r1, x1 = linecodes.r1, linecodes.x1
+        linhas.append({
+            "linecode": codigo, "fases": linecodes.phases,
+            "r1_ohm_km": r1, "x1_ohm_km": x1,
+            "r0_ohm_km": linecodes.r0, "x0_ohm_km": linecodes.x0,
+            "c1_nf_km": linecodes.c1, "c0_nf_km": linecodes.c0,
+            "normamps": linecodes.norm_amps, "x1_r1": x1 / r1 if r1 else float("nan"),
+        })
+    return pd.DataFrame(linhas)
+
+
 def montar_tabela_coordenadas(tabela_comparativa: pd.DataFrame, grafo, origem: str, coordenadas: dict,
                                tabela_resultados_referencia: pd.DataFrame,
                                quantidade: int = QUANTIDADE_COORDENADAS) -> pd.DataFrame:
@@ -235,7 +268,8 @@ def executar_analise_linecodes(pasta_saida: Path, pasta_takagi: Path, pasta_reat
             reatancia_compensada_resultados.csv).
     Saida:
         dicionario com "tabela_km", "tabela_erro_takagi",
-        "tabela_erro_reatancia", "tabela_comparativa", "tabela_coordenadas".
+        "tabela_erro_reatancia", "tabela_comparativa", "tabela_parametros",
+        "tabela_coordenadas".
     """
     pasta_saida = Path(pasta_saida)
     pasta_saida.mkdir(parents=True, exist_ok=True)
@@ -283,6 +317,24 @@ def executar_analise_linecodes(pasta_saida: Path, pasta_takagi: Path, pasta_reat
         alinhamento="lcccccc",
     )
 
+    tabela_parametros = montar_tabela_parametros_linecodes(contexto["dss"], tabela_comparativa)
+    tabela_parametros.to_csv(pasta_saida / "parametros_piores_linecodes.csv", index=False)
+    latex_utils.salvar_tabela_latex(
+        tabela_parametros.rename(columns={
+            "linecode": "Linecode", "fases": "Fases", "r1_ohm_km": "R1 (Ω/km)", "x1_ohm_km": "X1 (Ω/km)",
+            "r0_ohm_km": "R0 (Ω/km)", "x0_ohm_km": "X0 (Ω/km)", "c1_nf_km": "C1 (nF/km)", "c0_nf_km": "C0 (nF/km)",
+            "normamps": "Ampacidade (A)", "x1_r1": "X1/R1",
+        }),
+        pasta_saida / "parametros_piores_linecodes.txt",
+        legenda="Parâmetros elétricos dos linecodes mais associados a erro, tal como cadastrados na BDGD",
+        rotulo="parametros_piores_linecodes",
+        contexto="Secao 9 - parametros eletricos (Linecode do OpenDSS, sem correcao) dos linecodes da tabela "
+                 "piores_linecodes_comparativo, para conferencia de possiveis erros de preenchimento na BDGD.",
+        decimais={"Fases": 0, "R1 (Ω/km)": 3, "X1 (Ω/km)": 3, "R0 (Ω/km)": 3, "X0 (Ω/km)": 3,
+                  "C1 (nF/km)": 1, "C0 (nF/km)": 1, "Ampacidade (A)": 1, "X1/R1": 2},
+        alinhamento="lccccccccc",
+    )
+
     tabela_coordenadas = montar_tabela_coordenadas(
         tabela_comparativa, grafo, origem, contexto["coordenadas"], resultados_takagi)
     tabela_coordenadas.to_csv(pasta_saida / "coordenadas_para_street_view.csv", index=False)
@@ -303,4 +355,4 @@ def executar_analise_linecodes(pasta_saida: Path, pasta_takagi: Path, pasta_reat
 
     return {"tabela_km": tabela_km, "tabela_erro_takagi": tabela_erro_takagi,
             "tabela_erro_reatancia": tabela_erro_reatancia, "tabela_comparativa": tabela_comparativa,
-            "tabela_coordenadas": tabela_coordenadas}
+            "tabela_parametros": tabela_parametros, "tabela_coordenadas": tabela_coordenadas}

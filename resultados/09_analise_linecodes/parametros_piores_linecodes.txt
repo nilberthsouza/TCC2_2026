@@ -1,0 +1,24 @@
+% Contexto: Secao 9 - parametros eletricos (Linecode do OpenDSS, sem correcao) dos linecodes da tabela piores_linecodes_comparativo, para conferencia de possiveis erros de preenchimento na BDGD.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Parâmetros elétricos dos linecodes mais associados a erro, tal como cadastrados na BDGD}
+  \label{tab:parametros_piores_linecodes}
+  \begin{tabular}{lccccccccc}
+    \toprule
+    \textbf{Linecode} & \textbf{Fases} & \textbf{R1 (Ω/km)} & \textbf{X1 (Ω/km)} & \textbf{R0 (Ω/km)} & \textbf{X0 (Ω/km)} & \textbf{C1 (nF/km)} & \textbf{C0 (nF/km)} & \textbf{Ampacidade (A)} & \textbf{X1/R1} \\
+    \midrule
+    42_3 & 3 & 0{,}150 & 0{,}089 & 0{,}178 & 0{,}405 & 3{,}4 & 1{,}6 & 290{,}0 & 0{,}59 \\
+    157_3 & 3 & 0{,}805 & 0{,}269 & 0{,}178 & 0{,}405 & 3{,}4 & 1{,}6 & 183{,}3 & 0{,}33 \\
+    1222_1 & 1 & 0{,}975 & 0{,}524 & 0{,}178 & 0{,}405 & 3{,}4 & 1{,}6 & 265{,}2 & 0{,}54 \\
+    320_3 & 3 & 0{,}975 & 0{,}524 & 0{,}178 & 0{,}405 & 3{,}4 & 1{,}6 & 265{,}2 & 0{,}54 \\
+    748_3 & 3 & 2{,}469 & 0{,}507 & 0{,}178 & 0{,}405 & 3{,}4 & 1{,}6 & 146{,}9 & 0{,}21 \\
+    293_3 & 3 & 1{,}564 & 0{,}485 & 0{,}178 & 0{,}405 & 3{,}4 & 1{,}6 & 178{,}1 & 0{,}31 \\
+    46_3 & 3 & 1{,}551 & 0{,}521 & 0{,}178 & 0{,}405 & 3{,}4 & 1{,}6 & 197{,}6 & 0{,}34 \\
+    38_3 & 3 & 0{,}975 & 0{,}524 & 0{,}178 & 0{,}405 & 3{,}4 & 1{,}6 & 265{,}2 & 0{,}54 \\
+    35_3 & 3 & 0{,}975 & 0{,}524 & 0{,}178 & 0{,}405 & 3{,}4 & 1{,}6 & 265{,}2 & 0{,}54 \\
+    1191_1 & 1 & 0{,}326 & 0{,}591 & 0{,}178 & 0{,}405 & 3{,}4 & 1{,}6 & 559{,}0 & 1{,}81 \\
+    773_3 & 3 & 1{,}551 & 0{,}521 & 0{,}178 & 0{,}405 & 3{,}4 & 1{,}6 & 197{,}6 & 0{,}34 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
