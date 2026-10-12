@@ -1,0 +1,16 @@
+% Contexto: Secao 10 - sensibilidade analitica a Rf, por metodo.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Sensibilidade da distância estimada à resistência de falta (Rf), forma fechada}
+  \label{tab:sensibilidade_rf}
+  \begin{tabular}{lcl}
+    \toprule
+    \textbf{Método} & \textbf{S_Rf (km/Ω)} & \textbf{Origem} \\
+    \midrule
+    Reatância K0 (sem correção do offset) & -0{,}8145 & analítica (fechada) \\
+    Reatância compensada e corrigida & 0{,}0000 & exata (por construção) \\
+    Takagi compensado & 0{,}0000 & exata (por construção) \\
+    \bottomrule
+  \end{tabular}
+\end{table}

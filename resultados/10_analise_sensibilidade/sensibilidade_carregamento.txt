@@ -1,0 +1,15 @@
+% Contexto: Secao 10 - sensibilidade empirica ao carregamento (load_scale), por metodo.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Sensibilidade do erro (MAE) ao fator de carregamento, estimada por regressão linear}
+  \label{tab:sensibilidade_carregamento}
+  \begin{tabular}{lcc}
+    \toprule
+    \textbf{Método} & \textbf{S_carga (km MAE / unidade load\_scale)} & \textbf{R² do ajuste} \\
+    \midrule
+    Takagi compensado & 0{,}01709 & 0{,}9963 \\
+    Reatância compensada e corrigida & 0{,}01448 & 0{,}9966 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

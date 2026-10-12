@@ -1,0 +1,4 @@
+metodo,s_rf_km_ohm,origem
+Reatância K0 (sem correção do offset),-0.8145146647503453,analítica (fechada)
+Reatância compensada e corrigida,0.0,exata (por construção)
+Takagi compensado,0.0,exata (por construção)

@@ -1,0 +1,15 @@
+% Contexto: Secao 10 - sensibilidade numerica a R1 (perturbacao de +10%), amostra de 7 barras.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Sensibilidade normalizada da distância estimada a um erro no R1 de referência do condutor}
+  \label{tab:sensibilidade_r1}
+  \begin{tabular}{lcc}
+    \toprule
+    \textbf{Método} & \textbf{S_R1 (média)} & \textbf{S_R1 (desvio padrão)} \\
+    \midrule
+    Reatância compensada e corrigida & -0{,}0057 & 0{,}0010 \\
+    Takagi compensado & 0{,}3012 & 0{,}0020 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

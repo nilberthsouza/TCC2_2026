@@ -16,6 +16,7 @@ from tcc2026.topologia import visao_geral
 from tcc2026.faltas import tabela_barras
 from tcc2026.reatancia import estudo_compensada_corrigida, estudo_monofasico, estudo_trifasico
 from tcc2026.resistencia_falta import efeito_rf
+from tcc2026.sensibilidade import analise_sensibilidade
 from tcc2026.takagi import estudo_takagi, estudo_votacao
 
 SECOES_DISPONIVEIS = {
@@ -32,6 +33,10 @@ SECOES_DISPONIVEIS = {
     "analise_linecodes": (
         "09_analise_linecodes",
         lambda pasta: analise_linecodes.executar_analise_linecodes(
+            pasta, PASTA_RESULTADOS / "06_takagi", PASTA_RESULTADOS / "07_reatancia_compensada_corrigida")),
+    "analise_sensibilidade": (
+        "10_analise_sensibilidade",
+        lambda pasta: analise_sensibilidade.executar_analise_sensibilidade(
             pasta, PASTA_RESULTADOS / "06_takagi", PASTA_RESULTADOS / "07_reatancia_compensada_corrigida")),
 }
 
