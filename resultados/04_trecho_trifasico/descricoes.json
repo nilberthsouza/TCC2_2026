@@ -8,5 +8,11 @@
   "trecho_isolado.png": "Topologia esquemática (layout de grafo, não geográfico) do trecho trifásico extraído.",
   "trecho_destacado_no_alimentador.png": "Trecho trifásico (vermelho) destacado na topologia completa do alimentador (layout esquemático).",
   "trecho_destacado_geografico.png": "Mapa geográfico do alimentador JMLT310, com o trecho trifásico extraído destacado em vermelho.",
-  "carregamento_mae.png": "MAE do método de Takagi e da reatância compensada e corrigida, em função do fator de carregamento."
+  "carregamento_mae.png": "MAE do método de Takagi e da reatância compensada e corrigida, em função do fator de carregamento.",
+  "carregamento_3f_estimado_vs_real_carregamento.png": "Reatância compensada e corrigida (trecho trifásico) -- distância estimada vs. real, por fator de carregamento (load_scale).",
+  "carregamento_3f_erro_vs_real_carregamento.png": "Reatância compensada e corrigida (trecho trifásico) -- erro (estimado − real) vs. distância real, por fator de carregamento (load_scale).",
+  "carregamento_3f_reatancia_estimado_vs_real_carregamento.png": "Reatância compensada e corrigida (trecho trifásico) -- distância estimada vs. real, por fator de carregamento (load_scale).",
+  "carregamento_3f_reatancia_erro_vs_real_carregamento.png": "Reatância compensada e corrigida (trecho trifásico) -- erro (estimado − real) vs. distância real, por fator de carregamento (load_scale).",
+  "carregamento_3f_takagi_estimado_vs_real_carregamento.png": "Takagi compensado (trecho trifásico) -- distância estimada vs. real, por fator de carregamento (load_scale).",
+  "carregamento_3f_takagi_erro_vs_real_carregamento.png": "Takagi compensado (trecho trifásico) -- erro (estimado − real) vs. distância real, por fator de carregamento (load_scale)."
 }

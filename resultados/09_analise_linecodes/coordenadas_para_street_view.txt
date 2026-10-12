@@ -1,0 +1,21 @@
+% Contexto: Secao 9 - coordenadas (long/lat, EPSG:4326) das barras extremas do segmento de exemplo de cada linecode problematico, para conferencia visual do condutor real.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Coordenadas geográficas dos segmentos de pior desempenho, para inspeção visual (Google Street View)}
+  \label{tab:coordenadas_street_view}
+  \begin{tabular}{lllcccc}
+    \toprule
+    \textbf{Linecode} & \textbf{Barra de falta (exemplo)} & \textbf{De} & \textbf{Até} & \textbf{Long. (De)} & \textbf{Lat. (De)} & \textbf{Long. (Até)} & \textbf{Lat. (Até)} \\
+    \midrule
+    38_3 & NODE#1136793634 & NODE#445012811 & NODE#1136793634 & -43{,}148852 & -19{,}820096 & -43{,}149256 & -19{,}820575 \\
+    157_3 & NODE#1194264563 & NODE#433472718 & NODE#1194264563 & -43{,}155582 & -19{,}827602 & -43{,}155556 & -19{,}827612 \\
+    1222_1 & NODE#1981522711 & NODE#1981522710 & NODE#1981522711 & -43{,}153125 & -19{,}823036 & -43{,}154206 & -19{,}824800 \\
+    46_3 & NODE#2015114208 & NODE#445010792 & NODE#2015114208 & -43{,}159539 & -19{,}831412 & -43{,}159139 & -19{,}831505 \\
+    293_3 & NODE#424246698 & NODE#424246718 & NODE#424246698 & -43{,}139964 & -19{,}821669 & -43{,}141804 & -19{,}821860 \\
+    748_3 & NODE#424313022 & NODE#424312287 & NODE#424313022 & -43{,}137256 & -19{,}821973 & -43{,}137118 & -19{,}822022 \\
+    42_3 & NODE#433471648 & NODE#434600447 & NODE#433471648 & -43{,}165161 & -19{,}835986 & -43{,}159879 & -19{,}838102 \\
+    320_3 & NODE#433642918 & NODE#424246733 & NODE#433642918 & -43{,}139521 & -19{,}819630 & -43{,}138126 & -19{,}820603 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

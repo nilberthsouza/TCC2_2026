@@ -22,6 +22,7 @@ RF_PADRAO_OHM = 0.01
 QUANTIDADE_GRAFICO = 20
 QUANTIDADE_TABELA_ALEATORIA = 100
 SEMENTE_ALEATORIA = 42
+FATORES_CARREGAMENTO = [0, 1, 2, 4, 6, 8, 10]
 
 
 def preparar_amostras_e_medidas(pasta_saida: Path, rf_ohm: float = RF_PADRAO_OHM) -> dict:
@@ -199,8 +200,81 @@ def executar_amostragem_e_estudo(pasta_saida: Path) -> dict:
 
     tabela_multifolha, resumo_multifolha = avaliar_algoritmo1_multifolha(preparo, categorias, pasta_saida)
 
+    tabela_carregamento = executar_varredura_carregamento_global(pasta_saida)
+    tabela_carregamento.to_csv(pasta_saida / "carregamento_global_resultados.csv", index=False)
+    graficos.plotar_estimado_e_erro_por_carregamento(
+        tabela_carregamento, pasta_saida, "carregamento_global",
+        "Reatância compensada e corrigida (alimentador completo, 300 barras MT)")
+
+    tabela_carregamento_metricas = []
+    for fator, sub in tabela_carregamento.groupby("fator_carregamento"):
+        erro = sub["distancia_estimada_km"] - sub["distancia_real_km"]
+        tabela_carregamento_metricas.append({
+            "fator_carregamento": fator, "mae_km": erro.abs().mean(), "erro_medio_km": erro.mean(),
+            "erro_max_abs_km": erro.abs().max(),
+        })
+    pd.DataFrame(tabela_carregamento_metricas).to_csv(
+        pasta_saida / "carregamento_global_metricas.csv", index=False)
+
     return {"tabela": tabela, "tabela_metricas": tabela_metricas,
-            "tabela_multifolha": tabela_multifolha, "resumo_multifolha": resumo_multifolha}
+            "tabela_multifolha": tabela_multifolha, "resumo_multifolha": resumo_multifolha,
+            "tabela_carregamento": tabela_carregamento}
+
+
+def executar_varredura_carregamento_global(pasta_saida: Path, rf_ohm: float = RF_PADRAO_OHM,
+                                            fatores: list = FATORES_CARREGAMENTO) -> pd.DataFrame:
+    """
+    Avalia o metodo da reatancia compensada e corrigida sob fatores de
+    carregamento 0x-10x a carga nominal (Set LoadMult=, ver
+    dss_core.escalar_carregamento), nas 300 barras MT do alimentador
+    completo -- mesma logica de
+    tcc2026.reatancia.estudo_trifasico.executar_varredura_carregamento,
+    porem aplicada ao alimentador completo em vez de um trecho pequeno.
+
+    Entradas:
+        pasta_saida: pasta de resultados desta secao (usada para a
+            extracao do alimentador com geometria Cemig).
+        rf_ohm: resistencia de falta usada em todas as simulacoes (ohms).
+        fatores: lista de multiplicadores de carga a testar.
+    Saida:
+        DataFrame longo: fator_carregamento, barra, distancia_real_km,
+        distancia_estimada_km.
+    """
+    dados_geo = ge.calcular_parametros_sequencia_losangular_cemig()
+    z1_geo = complex(dados_geo["r1_ohm_km"], dados_geo["x1_ohm_km"])
+    z0_geo = complex(dados_geo["r0_ohm_km"], dados_geo["x0_ohm_km"])
+    k0 = mr.fator_compensacao_k0(z1_geo, z0_geo)
+
+    dss0 = dss_core.compilar_alimentador()
+    dss_core.definir_modo_instantaneo(dss0)
+    dss_core.resolver_fluxo_potencia(dss0)
+    grafo_completo = ga.componente_conexa_da_origem(ga.construir_grafo_eletrico(dss0), ga.obter_barra_origem(dss0))
+    origem0 = ga.obter_barra_origem(dss0)
+    caminho_master = et.extrair_subalimentador(
+        dss0, origem0, set(grafo_completo.nodes), pasta_saida / "alimentador_geometria_cemig_carregamento",
+        "JMLT310_GEOM_REAT_CARGA", usar_geometria_cemig_trifasica=True, usar_geometria_cemig_monofasica=True)
+
+    dss = et.compilar_subalimentador(caminho_master)
+    dss_core.definir_modo_instantaneo(dss)
+    dss_core.resolver_fluxo_potencia(dss)
+
+    grafo = ga.componente_conexa_da_origem(ga.construir_grafo_eletrico(dss), ga.obter_barra_origem(dss))
+    origem = ga.obter_barra_origem(dss)
+    barras_mt = sorted(ga.barras_de_media_tensao(grafo) - {origem})
+
+    linhas = []
+    for fator in fatores:
+        dss_core.escalar_carregamento(dss, fator)
+        if not dss_core.resolver_fluxo_potencia(dss):
+            raise RuntimeError(f"Fluxo de potencia nao convergiu para fator de carregamento {fator}.")
+        medidas = vf.executar_varredura(dss, grafo, origem, barras_mt, rf_ohm)
+        for _, linha in medidas.iterrows():
+            ia_comp_pos = mr.corrente_compensada(linha["ia_pos"], linha["i0_pos"], k0)
+            d_reatancia = mr.distancia_reatancia_corrigida_exata(linha["va_pos"], ia_comp_pos, z1_geo, z0_geo)
+            linhas.append({"fator_carregamento": fator, "barra": linha["barra"],
+                            "distancia_real_km": linha["distancia_real_km"], "distancia_estimada_km": d_reatancia})
+    dss_core.escalar_carregamento(dss, 1.0)
+    return pd.DataFrame(linhas)
 
 
 def avaliar_algoritmo1_multifolha(preparo: dict, categorias: dict, pasta_saida: Path) -> tuple:

@@ -2,5 +2,7 @@
   "reatancia_compensada_ramificacao.png": "Distância real x estimada (reatância compensada e corrigida) em 20 barras de ramificação.",
   "reatancia_compensada_folha.png": "Distância real x estimada (reatância compensada e corrigida) em 20 barras folha.",
   "reatancia_compensada_aleatoria.png": "Distância real x estimada (reatância compensada e corrigida) em 20 barras aleatórias (semente fixa).",
-  "reatancia_compensada_boxplot.png": "Distribuição do erro (estimado − real) do método da reatância compensada e corrigida, pelos 4 grupos de barras."
+  "reatancia_compensada_boxplot.png": "Distribuição do erro (estimado − real) do método da reatância compensada e corrigida, pelos 4 grupos de barras.",
+  "carregamento_global_estimado_vs_real_carregamento.png": "Reatância compensada e corrigida (alimentador completo, 300 barras MT) -- distância estimada vs. real, por fator de carregamento (load_scale).",
+  "carregamento_global_erro_vs_real_carregamento.png": "Reatância compensada e corrigida (alimentador completo, 300 barras MT) -- erro (estimado − real) vs. distância real, por fator de carregamento (load_scale)."
 }

@@ -10,6 +10,7 @@ Uso:
 import argparse
 from pathlib import Path
 
+from tcc2026.analise_linecodes import analise_linecodes
 from tcc2026.configuracao import PASTA_RESULTADOS
 from tcc2026.topologia import visao_geral
 from tcc2026.faltas import tabela_barras
@@ -28,6 +29,10 @@ SECOES_DISPONIVEIS = {
         "07_reatancia_compensada_corrigida",
         lambda pasta: estudo_compensada_corrigida.executar_amostragem_e_estudo(pasta)),
     "votacao_multifolha": ("08_votacao_multifolha", lambda pasta: estudo_votacao.executar_estudo_votacao(pasta)),
+    "analise_linecodes": (
+        "09_analise_linecodes",
+        lambda pasta: analise_linecodes.executar_analise_linecodes(
+            pasta, PASTA_RESULTADOS / "06_takagi", PASTA_RESULTADOS / "07_reatancia_compensada_corrigida")),
 }
 
 

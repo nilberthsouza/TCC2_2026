@@ -1,0 +1,24 @@
+% Contexto: Secao 9 - linecodes do ultimo segmento antes da barra de falta, para as barras de maior erro em cada metodo (uniao dos 10 piores de cada um).
+
+\begin{table}[htbp]
+  \centering
+  \caption{Linecodes mais associados a erro nos métodos de Takagi e reatância compensada e corrigida, cruzados com o ranking por quilometragem}
+  \label{tab:piores_linecodes}
+  \begin{tabular}{lcccccc}
+    \toprule
+    \textbf{Linecode} & \textbf{Rank (km)} & \textbf{km} & \textbf{\% do total} & \textbf{MAE Takagi (km)} & \textbf{N (Takagi)} & \textbf{MAE Reatância (km)} & \textbf{N (Reatância)} \\
+    \midrule
+    42_3 & 12 & 0{,}641 & 2{,}08 & 0{,}0856 & 2 & 0{,}0603 & 2 \\
+    157_3 & 25 & 0{,}022 & 0{,}07 & 0{,}0590 & 1 & 0{,}0385 & 1 \\
+    1222_1 & 18 & 0{,}224 & 0{,}73 & 0{,}0517 & 1 & 0{,}0313 & 1 \\
+    320_3 & 20 & 0{,}209 & 0{,}68 & 0{,}0484 & 1 & 0{,}0312 & 1 \\
+    748_3 & 19 & 0{,}223 & 0{,}72 & 0{,}0475 & 4 & 0{,}0301 & 4 \\
+    293_3 & 7 & 1{,}303 & 4{,}22 & 0{,}0463 & 15 & 0{,}0293 & 15 \\
+    46_3 & 2 & 5{,}400 & 17{,}51 & 0{,}0432 & 52 & 0{,}0267 & 52 \\
+    38_3 & 13 & 0{,}618 & 2{,}00 & 0{,}0413 & 7 & 0{,}0252 & 7 \\
+    35_3 & 3 & 3{,}463 & 11{,}23 & 0{,}0409 & 49 & 0{,}0250 & 49 \\
+    1191_1 & 17 & 0{,}286 & 0{,}93 & 0{,}0371 & 3 & 0{,}0212 & 3 \\
+    773_3 & 21 & 0{,}202 & 0{,}66 & 0{,}0366 & 2 & 0{,}0216 & 2 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

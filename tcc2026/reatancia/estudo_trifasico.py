@@ -20,7 +20,7 @@ from tcc2026.reatancia import metodo_reatancia as mr
 from tcc2026.takagi import metodo_takagi as mt
 
 RF_PADRAO_OHM = 0.01
-FATORES_CARREGAMENTO = [1, 2, 4, 6]
+FATORES_CARREGAMENTO = [0, 1, 2, 4, 6, 8, 10]
 
 RUBRICA_METODOS = {
     "original_sem_carga": "Sem compensação, sem cargas",
@@ -334,7 +334,8 @@ def gerar_metricas_e_graficos_carregamento(tabela_carregamento: pd.DataFrame, pa
         legenda="Erros do método de Takagi e da reatância compensada e corrigida, "
                 "por fator de carregamento (trecho trifásico)",
         rotulo="carregamento_3f_metricas",
-        contexto="Secao 4b - metricas de erro por fator de carregamento (1x/2x/4x/6x), Takagi vs reatancia corrigida.",
+        contexto="Secao 4b - metricas de erro por fator de carregamento (0/1/2/4/6/8/10x), "
+                 "Takagi vs reatancia corrigida.",
         decimais={"Fator": 0, "MAE (km)": 4, "RMSE (km)": 4, "R²": 4, "Erro Máx. (km)": 4, "Erro Médio (km)": 4},
         alinhamento="ccccccc",
     )
@@ -352,6 +353,12 @@ def gerar_metricas_e_graficos_carregamento(tabela_carregamento: pd.DataFrame, pa
         fig, pasta_saida / "carregamento_mae.png",
         "MAE do método de Takagi e da reatância compensada e corrigida, em função do fator de carregamento."
     )
+    sub_reatancia = tabela_carregamento[tabela_carregamento["metodo"] == "Reatância compensada e corrigida"]
+    graficos.plotar_estimado_e_erro_por_carregamento(
+        sub_reatancia, pasta_saida, "carregamento_3f_reatancia", "Reatância compensada e corrigida (trecho trifásico)")
+    sub_takagi = tabela_carregamento[tabela_carregamento["metodo"] == "Takagi compensado"]
+    graficos.plotar_estimado_e_erro_por_carregamento(
+        sub_takagi, pasta_saida, "carregamento_3f_takagi", "Takagi compensado (trecho trifásico)")
     return tabela_metricas
 
 

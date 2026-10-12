@@ -8,5 +8,7 @@
   "trecho_isolado.png": "Topologia esquemática (layout de grafo, não geográfico) do trecho monofásico extraído.",
   "trecho_destacado_no_alimentador.png": "Trecho monofásico (vermelho) destacado na topologia completa do alimentador (layout esquemático).",
   "trecho_destacado_geografico.png": "Mapa geográfico do alimentador JMLT310, com o trecho monofásico extraído destacado em vermelho.",
-  "carregamento_mae.png": "MAE do método da reatância simples, em função do fator de carregamento (trecho monofásico)."
+  "carregamento_mae.png": "MAE do método da reatância simples, em função do fator de carregamento (trecho monofásico).",
+  "carregamento_1f_estimado_vs_real_carregamento.png": "Reatância simples (trecho monofásico) -- distância estimada vs. real, por fator de carregamento (load_scale).",
+  "carregamento_1f_erro_vs_real_carregamento.png": "Reatância simples (trecho monofásico) -- erro (estimado − real) vs. distância real, por fator de carregamento (load_scale)."
 }

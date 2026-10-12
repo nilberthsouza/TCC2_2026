@@ -49,6 +49,59 @@ def salvar_figura(fig: plt.Figure, caminho_arquivo: Path, descricao: str) -> Pat
     return caminho_arquivo
 
 
+def plotar_estimado_e_erro_por_carregamento(tabela, pasta_saida: Path, prefixo: str, descricao_metodo: str) -> None:
+    """
+    Gera duas figuras a partir de uma varredura de carregamento (uma linha
+    por fator_carregamento, colorida em escala viridis): distancia
+    estimada x real, e erro (estimado - real) x real.
+
+    Entradas:
+        tabela: DataFrame com colunas "fator_carregamento", "distancia_real_km",
+            "distancia_estimada_km" (uma linha por barra testada em cada fator).
+        pasta_saida: pasta de resultados onde salvar as figuras.
+        prefixo: prefixo do nome dos arquivos gerados.
+        descricao_metodo: nome do metodo/escopo, usado na legenda das figuras
+            (registrado em descricoes.json).
+    Saida:
+        nenhuma (salva os dois .png em pasta_saida).
+    """
+    aplicar_estilo_padrao()
+    fatores = sorted(tabela["fator_carregamento"].unique())
+    paleta = sns.color_palette("viridis", n_colors=len(fatores))
+
+    fig, eixo = plt.subplots(figsize=(7, 5.5))
+    for cor, fator in zip(paleta, fatores):
+        sub = tabela[tabela["fator_carregamento"] == fator].sort_values("distancia_real_km")
+        eixo.plot(sub["distancia_real_km"], sub["distancia_estimada_km"], marker="o", color=cor,
+                  label=f"load_scale={fator:g}", linewidth=1.2, markersize=4)
+    limite = max(tabela["distancia_real_km"].max(), tabela["distancia_estimada_km"].max()) * 1.05
+    eixo.plot([0, limite], [0, limite], linestyle="--", color="black", linewidth=1, label="Real (y = x)")
+    eixo.set_xlabel("Distância real da falta (km)")
+    eixo.set_ylabel("Distância estimada (km)")
+    eixo.legend(fontsize=7, ncol=2)
+    sns.despine(ax=eixo)
+    salvar_figura(
+        fig, pasta_saida / f"{prefixo}_estimado_vs_real_carregamento.png",
+        f"{descricao_metodo} -- distância estimada vs. real, por fator de carregamento (load_scale)."
+    )
+
+    fig, eixo = plt.subplots(figsize=(7, 5.5))
+    for cor, fator in zip(paleta, fatores):
+        sub = tabela[tabela["fator_carregamento"] == fator].sort_values("distancia_real_km")
+        erro = sub["distancia_estimada_km"] - sub["distancia_real_km"]
+        eixo.plot(sub["distancia_real_km"], erro, marker="o", color=cor,
+                  label=f"load_scale={fator:g}", linewidth=1.2, markersize=4)
+    eixo.axhline(0, color="black", linestyle="--", linewidth=1)
+    eixo.set_xlabel("Distância real da falta (km)")
+    eixo.set_ylabel("Erro (km)")
+    eixo.legend(fontsize=7, ncol=2)
+    sns.despine(ax=eixo)
+    salvar_figura(
+        fig, pasta_saida / f"{prefixo}_erro_vs_real_carregamento.png",
+        f"{descricao_metodo} -- erro (estimado − real) vs. distância real, por fator de carregamento (load_scale)."
+    )
+
+
 def registrar_descricao_imagem(caminho_arquivo: Path, descricao: str) -> None:
     """
     Adiciona/atualiza a entrada de uma imagem no indice descricoes.json da

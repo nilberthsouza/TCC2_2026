@@ -2,5 +2,7 @@
   "takagi_ramificacao.png": "Distância real x estimada (método de Takagi compensado) em 20 barras de ramificação.",
   "takagi_folha.png": "Distância real x estimada (método de Takagi compensado) em 20 barras folha.",
   "takagi_aleatoria.png": "Distância real x estimada (método de Takagi compensado) em 20 barras aleatórias (semente fixa).",
-  "takagi_boxplot.png": "Distribuição do erro (estimado − real) do método de Takagi compensado, pelos 4 grupos de barras."
+  "takagi_boxplot.png": "Distribuição do erro (estimado − real) do método de Takagi compensado, pelos 4 grupos de barras.",
+  "carregamento_global_estimado_vs_real_carregamento.png": "Takagi compensado (alimentador completo, 300 barras MT) -- distância estimada vs. real, por fator de carregamento (load_scale).",
+  "carregamento_global_erro_vs_real_carregamento.png": "Takagi compensado (alimentador completo, 300 barras MT) -- erro (estimado − real) vs. distância real, por fator de carregamento (load_scale)."
 }

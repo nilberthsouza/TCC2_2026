@@ -16,7 +16,7 @@ from tcc2026.nucleo import mapa_geografico as mg
 from tcc2026.reatancia import metodo_reatancia as mr
 
 RF_PADRAO_OHM = 0.01
-FATORES_CARREGAMENTO = [1, 2, 4, 6]
+FATORES_CARREGAMENTO = [0, 1, 2, 4, 6, 8, 10]
 
 
 def extrair_trecho(pasta_saida: Path) -> dict:
@@ -235,7 +235,7 @@ def gerar_metricas_e_graficos_carregamento(tabela_carregamento: pd.DataFrame, pa
         pasta_saida / "carregamento_metricas.txt",
         legenda="Erros do método da reatância simples, por fator de carregamento (trecho monofásico)",
         rotulo="carregamento_1f_metricas",
-        contexto="Secao 3b - metricas de erro por fator de carregamento (1x/2x/4x/6x), reatancia simples.",
+        contexto="Secao 3b - metricas de erro por fator de carregamento (0/1/2/4/6/8/10x), reatancia simples.",
         decimais={"Fator": 0, "MAE (km)": 4, "RMSE (km)": 4, "R²": 4, "Erro Máx. (km)": 4, "Erro Médio (km)": 4},
         alinhamento="cccccc",
     )
@@ -251,6 +251,8 @@ def gerar_metricas_e_graficos_carregamento(tabela_carregamento: pd.DataFrame, pa
         fig, pasta_saida / "carregamento_mae.png",
         "MAE do método da reatância simples, em função do fator de carregamento (trecho monofásico)."
     )
+    graficos.plotar_estimado_e_erro_por_carregamento(
+        tabela_carregamento, pasta_saida, "carregamento_1f", "Reatância simples (trecho monofásico)")
     return tabela_metricas
 
 

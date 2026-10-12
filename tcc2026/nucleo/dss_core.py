@@ -84,22 +84,38 @@ def definir_modo_instantaneo(dss: py_dss_interface.DSS) -> None:
     dss.text("set hour=0")
 
 
+LOADMULT_MINIMO = 1e-4
+
+
 def escalar_carregamento(dss: py_dss_interface.DSS, fator: float) -> None:
     """
     Escala uniformemente todas as cargas do circuito ativo por `fator`,
     via o multiplicador global de carga do OpenDSS (Set LoadMult=), sem
     alterar os valores nominais de kW/kvar de cada objeto Load. Usado para
-    simular cenarios de carregamento 2x/4x/6x (ver
-    tcc2026.reatancia.estudo_trifasico/estudo_monofasico).
+    simular cenarios de carregamento 0x/2x/4x/6x (ver
+    tcc2026.reatancia.estudo_trifasico/estudo_monofasico/estudo_compensada_corrigida).
+
+    ATENCAO: fator=0 exato (LoadMult=0, circuito com carga nula em TODAS as
+    barras) foi observado produzindo uma falsa convergencia no OpenDSS --
+    o solver reporta sucesso, mas a corrente no elemento Fault e na fonte
+    deixam de respeitar a lei de Kirchhoff das correntes (divergem por
+    varias ordens de grandeza), indicando uma solucao nao-fisica. Por isso,
+    fator=0 e substituido por LOADMULT_MINIMO (0,01% da carga nominal) --
+    numericamente equivalente a carga nula para qualquer finalidade deste
+    trabalho (a propria corrente de carga nominal ja e desprezivel frente
+    a corrente de falta, ver Secao 4.2/4.5), mas evita o grau de liberdade
+    "carga identicamente nula" que dispara o problema.
 
     Entradas:
         dss: instancia do motor OpenDSS (ja compilada).
-        fator: multiplicador de carga (1.0 = carregamento nominal).
+        fator: multiplicador de carga (1.0 = carregamento nominal; 0 e
+            tratado como LOADMULT_MINIMO, ver acima).
     Saida:
         nenhuma (altera o estado interno do solver; chamar
         resolver_fluxo_potencia novamente apos esta funcao).
     """
-    dss.text(f"Set LoadMult={fator}")
+    fator_aplicado = fator if fator > 0 else LOADMULT_MINIMO
+    dss.text(f"Set LoadMult={fator_aplicado}")
 
 
 def calcular_impedancia_equivalente_subestacao(dados_subestacao: dict = SUBESTACAO) -> dict:
