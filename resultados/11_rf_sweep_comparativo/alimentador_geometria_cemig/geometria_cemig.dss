@@ -1,0 +1,7 @@
+New wiredata.COND_REF_CEMIG Rdc=0.535 Rac=0.587 GMRac=0.00136 GMRunits=m Radius=0.00525 Diam=0.0105 radunits=m normamps=230 runits=km
+New linegeometry.GEOM_LOSANG_CEMIG nconds=4 nphases=3 reduce=yes
+~ cond=1 wire=COND_REF_CEMIG x=0.125  h=8.0
+~ cond=2 wire=COND_REF_CEMIG x=-0.125 h=8.0
+~ cond=3 wire=COND_REF_CEMIG x=0.0   h=7.8
+~ cond=4 wire=COND_REF_CEMIG x=0.0   h=8.2
+~ units=m

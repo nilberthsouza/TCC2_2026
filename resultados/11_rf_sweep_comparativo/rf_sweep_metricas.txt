@@ -1,0 +1,23 @@
+% Contexto: Secao 11 - varredura de Rf comparando os dois metodos nas mesmas faltas simuladas.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Comparação direta entre Takagi compensado e reatância compensada e corrigida, em função de Rf, nas mesmas 300 barras MT do alimentador completo}
+  \label{tab:rf_sweep_comparativo}
+  \begin{tabular}{lcccccc}
+    \toprule
+    \textbf{Rf (Ω)} & \textbf{Método} & \textbf{MAE (km)} & \textbf{RMSE (km)} & \textbf{R²} & \textbf{Erro Médio (km)} & \textbf{Erro Máx. (km)} \\
+    \midrule
+    0{,}01 & Reatância compensada e corrigida & 0{,}0187 & 0{,}0241 & 0{,}9999 & -0{,}0187 & 0{,}0643 \\
+    10{,}00 & Reatância compensada e corrigida & 0{,}0418 & 0{,}0488 & 0{,}9994 & 0{,}0400 & 0{,}1072 \\
+    25{,}00 & Reatância compensada e corrigida & 0{,}4506 & 0{,}4662 & 0{,}9475 & 0{,}4506 & 0{,}7072 \\
+    50{,}00 & Reatância compensada e corrigida & 1{,}9479 & 1{,}9943 & 0{,}0394 & 1{,}9479 & 2{,}7629 \\
+    100{,}00 & Reatância compensada e corrigida & 7{,}3098 & 7{,}4562 & -12{,}4265 & 7{,}3098 & 9{,}8865 \\
+    0{,}01 & Takagi compensado & 0{,}0330 & 0{,}0382 & 0{,}9996 & -0{,}0330 & 0{,}0899 \\
+    10{,}00 & Takagi compensado & 8{,}0595 & 8{,}0597 & -14{,}6877 & -8{,}0595 & 8{,}1679 \\
+    25{,}00 & Takagi compensado & 20{,}5785 & 20{,}5811 & -101{,}2969 & -20{,}5785 & 21{,}2195 \\
+    50{,}00 & Takagi compensado & 40{,}1686 & 40{,}1880 & -389{,}0486 & -40{,}1686 & 42{,}2598 \\
+    100{,}00 & Takagi compensado & 89{,}4471 & 89{,}6347 & -1939{,}3376 & -89{,}4471 & 98{,}7768 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

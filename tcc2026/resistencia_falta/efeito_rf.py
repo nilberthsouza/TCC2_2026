@@ -2,7 +2,12 @@
 Secao 5: efeito da resistencia de falta (Rf) na distancia estimada.
 
 - Trecho monofasico: 10 barras distribuidas ao longo do trecho, curto-
-  circuito com 4 valores de Rf (0,01, 5, 15 e 25 ohm), metodo da reatancia
+  circuito com 5 valores de Rf (0,01, 10, 25, 50 e 100 ohm -- faixa alinhada
+  a literatura de localizacao de faltas em distribuicao, nao a resistencia
+  de arco isoladamente: GABR et al. 2017 testam ate 100 ohm num alimentador
+  real de 11 kV, justificando pela resistencia de aterramento de torre;
+  DAVI, OLESKOVICZ e LOPES 2023 tambem variam a resistencia de falta a
+  terra ate 100 ohm, por contato com vegetacao), metodo da reatancia
   simples (sem compensacao, ja que o trecho e monofasico).
 - Trecho trifasico: superficie 3D (analitica) mostrando como Rf e a
   diferenca angular entre Z1 e Z0 afetam o offset introduzido na distancia
@@ -23,7 +28,7 @@ from tcc2026.nucleo import dss_core, falta_injecao as fi, geometria_eletrica as 
 from tcc2026.nucleo import grafo_alimentador as ga, graficos
 from tcc2026.reatancia import estudo_monofasico, metodo_reatancia as mr
 
-RF_VALORES_OHM = [0.01, 5.0, 15.0, 25.0]
+RF_VALORES_OHM = [0.01, 10.0, 25.0, 50.0, 100.0]
 
 
 def selecionar_dez_barras_distribuidas(distancias: dict, origem: str) -> list:
@@ -109,13 +114,13 @@ def executar_efeito_rf_monofasico(pasta_saida: Path) -> dict:
     sns.despine(ax=eixo)
     graficos.salvar_figura(
         fig, pasta_saida / "efeito_rf_monofasico.png",
-        "Erro do método da reatância simples em função da distância real, para 4 valores de resistência de falta."
+        "Erro do método da reatância simples em função da distância real, para 5 valores de resistência de falta."
     )
     return {"tabela": tabela, "x1_ref_ohm_km": x1_ref}
 
 
 def executar_efeito_rf_trifasico_3d(pasta_saida: Path,
-                                     rf_max_ohm: float = 25.0,
+                                     rf_max_ohm: float = 100.0,
                                      delta_theta_max_graus: float = 60.0,
                                      resolucao: int = 40) -> dict:
     """

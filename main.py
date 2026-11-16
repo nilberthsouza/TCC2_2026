@@ -11,6 +11,7 @@ import argparse
 from pathlib import Path
 
 from tcc2026.analise_linecodes import analise_linecodes
+from tcc2026.comparacao import rf_sweep_comparativo
 from tcc2026.configuracao import PASTA_RESULTADOS
 from tcc2026.topologia import visao_geral
 from tcc2026.faltas import tabela_barras
@@ -38,6 +39,9 @@ SECOES_DISPONIVEIS = {
         "10_analise_sensibilidade",
         lambda pasta: analise_sensibilidade.executar_analise_sensibilidade(
             pasta, PASTA_RESULTADOS / "06_takagi", PASTA_RESULTADOS / "07_reatancia_compensada_corrigida")),
+    "rf_sweep_comparativo": (
+        "11_rf_sweep_comparativo",
+        lambda pasta: rf_sweep_comparativo.executar_rf_sweep_comparativo(pasta)),
 }
 
 

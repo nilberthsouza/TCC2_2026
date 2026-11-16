@@ -1,0 +1,4 @@
+{
+  "rf_sweep_mae_comparativo.png": "MAE do Takagi compensado e da reatância compensada e corrigida, em função de Rf, nas mesmas 300 barras MT do alimentador completo.",
+  "rf_sweep_erro_medio_comparativo.png": "Erro médio (viés) do Takagi compensado e da reatância compensada e corrigida, em função de Rf, nas mesmas 300 barras MT do alimentador completo."
+}
